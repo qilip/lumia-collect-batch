@@ -1,0 +1,30 @@
+{
+  "name": "lumia-collect-batch",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config --watch src/ src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qilip/lumia-collect-batch.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qilip/lumia-collect-batch/issues"
+  },
+  "homepage": "https://github.com/qilip/lumia-collect-batch#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "mongoose": "^5.13.5",
+    "node-cron": "^3.0.0"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.12"
+  }
+}
