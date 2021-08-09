@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const Game = new Schema({
@@ -9,14 +9,14 @@ Game.statics.findByGameId = function (gameId) {
   return this.findOne({gameId}).exec();
 };
 
-Game.statics.create = function (gameData) {
+Game.statics.create = async function (gameData) {
+  const existGame = await this.findOne({gameId:gameData.gameId}).exec();
+  if(existGame){
+    Object.assign(existGame, gameData);
+    return existGame.save();
+  }
   const game = new this(gameData);
   return game.save();
 };
 
-Game.statics.update = function (gameDoc, gameData) {
-  if(gameData) Object.assign(gameDoc, gameData);
-  return gameDoc.save();
-};
-
-module.exports = mongoose.model('Game', Game);
+export default mongoose.model('Game', Game);

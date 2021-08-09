@@ -2,12 +2,29 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const User = new Schema({
-  userNum: { type: Number, index: true, required: true },
-  nickname: { type: String, unique: true, required: true },
-  beforeNickname: [{ any: {} }],
-  userRankStat: [{ any: {} }],
-  recentGames: [{ any: {} }],
-  collectedGamesId: [{ any: {} }]
+  userNum: { type: Number, unique: true, required: true },
+  nickname: { type: String, index: true, required: true },
+  beforeNickname: [{
+    lastseenAt: Date,
+    nickname: String,
+    _id: false
+  }],
+  userRankStat: [{ 
+    updatedAt: Date,
+    seasonId: Number,
+    solo: [{ any: {} }],
+    duo: [{ any: {} }],
+    squad: [{ any: {} }],
+    userStats: [{ any: {} }],
+    _id: false
+  }],
+  recentGames: [{ any: {}, _id: false }],
+  collectedGameId: {
+    type: Map,
+    of: String,
+    default: {},
+    required: true
+  }
 }, { timestamps: true, strict: false });
 
 // Model methods
@@ -27,39 +44,41 @@ User.statics.create = function (userData) {
 
 User.statics.update = function (userDoc, newData) {
   if(newData.nickname && userDoc.nickname !== newData.nickname){
-    userDoc.beforeNickname.push(
-      {
-        lastTime: userDoc.updatedAt,
-        nickname: userDoc.nickname
-      }
-    );
+    if(userDoc.nickname !== '##UNKNOWN##')
+      userDoc.beforeNickname.push(
+        {
+          lastseenAt: userDoc.updatedAt,
+          nickname: userDoc.nickname
+        }
+      );
     userDoc.nickname = newData.nickname;
     userDoc.markModified('beforeNickname');
   }
   
   if(newData.userRankStat){
-    userDoc.userRankStat.push(...newData.userRankStat);
+    userDoc.userRankStat.push(newData.userRankStat);
     userDoc.markModified('userRankStat');
   }
-  
-  if(newData.recentGames){
-    newData.recentGames.push(...userDoc.recentGames);
-    userDoc.recentGames = [...new Set(newData.recentGames)];
+
+  if(newData.collectedGameId){
+    newData.collectedGameId.map((cur, idx) => {
+      const value = userDoc.collectedGameId.get(cur.gameId);
+      if(value){
+        if(cur.hasNext === 'f')
+          userDoc.collectedGameId.set(cur.gameId, cur.hasNext);
+        else if(value === 'n' && cur.hasNext ==='y')
+          userDoc.collectedGameId.set(cur.gameId, cur.hasNext);
+      }else{
+        userDoc.collectedGameId.set(cur.gameId, cur.hasNext);
+        userDoc.recentGames.push(newData.recentGames[idx]);
+      }
+    });
+    
     userDoc.markModified('recentGames');
-  }
-  
-  if(newData.collectedGamesId){
-    newData.collectedGamesId.push(...userDoc.collectedGamesId);
-    userDoc.collectedGamesId = [...new Set(newData.collectedGamesId)];
-    userDoc.markModified('collectedGamesId');
+    userDoc.markModified('collectedGameId');
   }
   
   return userDoc.save();
-};
-
-User.statics.changeNickname = function (userDoc, nickname) {
-  userDoc.nickname = nickname;
-  userDoc.save();
 };
 
 export default mongoose.model('User', User);

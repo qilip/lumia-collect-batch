@@ -125,7 +125,10 @@ export async function getUserGames(userNum, start){
     return {
       'erCode': res.data.code,
       'message': res.data.message,
-      'data': { 'games': res.data.userGames }
+      'data': {
+        'games': res.data.userGames,
+        'last': res.data.next > 0 ? false : true
+      }
     };
   }catch(e){
     console.error(e);
@@ -144,7 +147,10 @@ export async function getGame(gameId){
     return {
       'erCode': res.data.code,
       'message': res.data.message,
-      'data': { 'games': res.data.userGames }
+      'data': { 
+        'gameId': gameId,
+        'games': res.data.userGames
+      }
     };
   }catch(e){
     console.error(e);
@@ -163,13 +169,35 @@ export async function getRoute(routeId){
     return {
       'erCode': res.data.code,
       'message': res.data.message,      
-      'data': { 'route': res.data.result }
+      'data': {
+        'routeId': routeId,
+        'route': res.data.result
+      }
     };
   }catch(e){
     console.error(e);
     return {
       'statusCode': 500,
       'message': 'Lumia Collect server error'
+    };
+  }
+}
+
+export async function getFreeCharacters(matchingMode){
+  if(!matchingMode) return { 'statusCode': 400, 'message': 'parameter empty' };
+  try{
+    const res = await er.get('/freeCharacters/' + matchingMode);
+    console.log('getFreeCharacters Response Time: ' + res.duration);
+    return {
+      'erCode': res.data.code,
+      'message': res.data.message,
+      'data': { 'freeCharacters': res.data.freeCharacters }
+    };
+  }catch(e){
+    console.error(e);
+    return {
+      'statusCode': 500,
+      'message': 'Lumia Collect Server error'
     };
   }
 }
@@ -197,7 +225,10 @@ export async function getUserRecentGames(userNum, start, limit){
     return {
       'erCode': res.data.code,
       'message': res.data.message,
-      'data': { 'games': res.data.userGames }
+      'data': {
+        'games': games,
+        'last': res.data.next > 0 ? false : true
+      }
     };
   }catch(e){
     console.error(e);

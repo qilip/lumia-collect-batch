@@ -1,23 +1,23 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const Route = new Schema({
-  id: { type: Number, unique: true, required: true },
+  routeId: { type: Number, unique: true, required: true },
 }, { timestamps: true, strict: false });
 
 Route.statics.findByRouteId = function (routeId) {
   return this.findOne({routeId}).exec();
 };
 
-Route.statics.create = function (routeData) {
-  const route = new this(routeData);
-  return route.save();
+Route.statics.create = async function (routeData) {
+  const existRoute = await this.findOne({routeId: routeData.routeId}).exec();
+  if(existRoute){
+    if(routeData.routeVersion && existRoute.routeVersion < routeData.routeVersion)
+      existRoute = routeData;
+    return existRoute.save();
+  }
+  const Route = new this(routeData);
+  return Route.save();
 };
 
-Route.statics.update = function (routeDoc, routeData) {
-  if(routeData.routeVersion && routeDoc.routeVersion < routeData.routeVersion)
-    routeDoc = routeData;
-  return routeDoc.save();
-};
-
-module.exports = mongoose.model('Route', Route);
+export default mongoose.model('Route', Route);
