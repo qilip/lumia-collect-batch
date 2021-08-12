@@ -28,7 +28,7 @@ export async function getUserNum(nickname){
     const saved = await User.create({ nickname, userNum });
     if(saved) console.log(nickname + ' UserNum saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -41,7 +41,7 @@ export async function getUserRank(userNum, seasonId){
   try{
     res = await er.getUserRank(userNum, seasonId);
   }catch(e){
-    console.error(e);
+    return res;
   }
   if(res.statusCode === 200){
     const saved = await User.update(user, {
@@ -55,7 +55,7 @@ export async function getUserRank(userNum, seasonId){
     });
     if(saved) console.log(userNum + ' season: ' + seasonId + ' userRank saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -68,7 +68,7 @@ export async function getUserStats(userNum, seasonId){
   try{
     res = await er.getUserStats(userNum, seasonId);
   }catch(e){
-    console.error(e);
+    return res;
   }
   if(res.erCode === 200){
     const saved = await User.update(user, {
@@ -80,7 +80,7 @@ export async function getUserStats(userNum, seasonId){
     });
     if(saved) console.log(userNum + ' season: ' + seasonId + ' userStats saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -108,7 +108,7 @@ export async function getUserSeason(userNum, seasonId){
     });
     if(saved) console.log(userNum + ' season: ' + seasonId + ' userSeason saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -140,7 +140,7 @@ export async function getUserGames(userNum, start){
     });
     if(saved) console.log(userNum + ' userGames saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -172,7 +172,7 @@ export async function getUserRecentGames(userNum, start, limit){
     });
     if(saved) console.log(userNum + ' userRecentGames saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -187,7 +187,7 @@ export async function getGame(gameId){
     const saved = await Game.create(res.data);
     if(saved) console.log(gameId + ' gamedata saved or updated');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -202,7 +202,7 @@ export async function getRoute(routeId){
     const saved = await Route.create(res.data);
     if(saved) console.log(routeId + ' route saved or updated');
   }else{
-    console.log(res.message);
+    return res;
   }
 }
 
@@ -220,6 +220,6 @@ export async function getFreeCharacters(matchingMode){
     });
     if(saved) console.log(matchingMode + ' FreeCharacter saved');
   }else{
-    console.log(res.message);
+    return res;
   }
 }

@@ -256,7 +256,8 @@ export async function getUserSeason(userNum, seasonId){
           return res.value.data;
         }else{
           console.log('getUserSeason[' + idx + '] Fail Response Time:' + res.reason.duration);
-          return { 'code': 500, 'message': 'axios request fail' };
+          console.log(res.reason.data.message);
+          return { 'code': 500, 'message': 'axios request error' };
         }
       }
     );
@@ -269,6 +270,28 @@ export async function getUserSeason(userNum, seasonId){
         'duo': data[1],
         'squad': data[2],
         'userStats': data[3]
+      }
+    };
+  }catch(e){
+    console.error(e);
+    return {
+      'statusCode': 500,
+      'message': 'Lumia Collect server error'
+    };
+  }
+}
+
+export async function getGameData(metaType){
+  if(!metaType)
+    return { 'statusCode': 400, 'message': 'parameter empty' };
+  try{
+    const res = await er.get('/data/' + metaType);
+    console.log('getGameData Response Time: ' + res.duration);
+    return {
+      'erCode': res.data.code,
+      'message': res.data.message,      
+      'data': {
+        'data': res.data.data
       }
     };
   }catch(e){

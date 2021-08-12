@@ -12,18 +12,17 @@ const User = new Schema({
   userRankStat: [{ 
     updatedAt: Date,
     seasonId: Number,
-    solo: [{ any: {} }],
-    duo: [{ any: {} }],
-    squad: [{ any: {} }],
-    userStats: [{ any: {} }],
+    solo: { type:Array, default: [], _id: false },
+    duo: { type:Array, default: [], _id: false },
+    squad: { type:Array, default: [], _id: false },
+    userStats: { type:Array, default: [], _id: false },
     _id: false
   }],
-  recentGames: [{ any: {}, _id: false }],
+  recentGames: { type:Array, default: [], _id: false },
   collectedGameId: {
     type: Map,
     of: String,
-    default: {},
-    required: true
+    default: {}
   }
 }, { timestamps: true, strict: false });
 

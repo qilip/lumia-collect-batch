@@ -8,8 +8,8 @@ export default async () => {
         useUnifiedTopology: true,
         useCreateIndex: true,
         serverSelectionTimeoutMS: 5000
-      });
-      await console.log('MongoDB Connected');
+      })
+      .then(console.log('MongoDB Connected'));
     }catch(e){
       console.log(e);
     }
