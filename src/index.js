@@ -1,5 +1,4 @@
 import cron from 'node-cron';
-import Bottleneck from 'bottleneck';
 import connect from './connectdb.js';
 import * as job from './api/job.js';
 // import * as ctrl from './api/ctrl.js';
@@ -8,47 +7,43 @@ import * as job from './api/job.js';
 // Connect MongoDB
 await connect();
 
-const limiter = new Bottleneck({
-  reservoir: 100,
-  reservoirIncreaseAmount: 50,
-  reservoirIncreaseInterval: 1000,
-  reservoirIncreaseMaximum: 100,
-  
-  maxConcurrent: 30,
-  minTime: 50,
+import Queue from './models/queue.js';
+
+Queue.create({
+  jobFuncName: 'getUserSeason',
+  priority: 5,
+  data: [
+    { userNum: 2773385, seasonId: 5 },
+    { userNum: 2773385, seasonId: 4 },
+    { userNum: 2773385, seasonId: 3 },
+    { userNum: 2773385, seasonId: 2 },
+    { userNum: 2773385, seasonId: 1 }
+  ]
 });
 
-// import Queue from './models/queue.js';
+Queue.create({
+  jobFuncName: 'getUserStats',
+  priority: 4,
+  data: [
+    { userNum: 2773385, seasonId: 0 }
+  ]
+});
 
-// Queue.create({
-//   jobFuncName: 'getUserStats',
-//   priority: 5,
-//   data: [{ userNum: 2773385, seasonId: 0 }]
-// });
+import * as ctrl from './api/ctrl.js';
+// await ctrl.getUserNum('김해사는그남자');
+// await ctrl.getUserRank(1018085, 5);
+// await ctrl.getUserSeason(2773385, 3);
 
 cron.schedule('* * * * * *', () => {
-  job.queue(limiter);
+  job.queue();
 });
 
 cron.schedule('* * * * *', () => {
-  job.schedule(limiter);
+  job.schedule();
 });
 
 cron.schedule('* * * * *', () => {
-  if(limiter.empty()){
-    job.cleanupQueue();
-    job.idle(limiter);
-  }
-});
-
-limiter.on('error', (error) => {
-  console.error('limiter: ERROR');
-  console.error(error);
-});
-
-limiter.on('failed', (error, jobInfo) => {
-  console.warn('limiter: Job [ ' + JSON.stringify(jobInfo, 0, 2) + ' ] Failed');
-  console.warn(error);
+  job.idle();
 });
 
 // await ctrl.getFreeCharacters(2);

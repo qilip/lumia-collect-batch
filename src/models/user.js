@@ -9,15 +9,21 @@ const User = new Schema({
     nickname: String,
     _id: false
   }],
-  userRankStat: [{ 
-    updatedAt: Date,
-    seasonId: Number,
-    solo: { type:Array, default: [], _id: false },
-    duo: { type:Array, default: [], _id: false },
-    squad: { type:Array, default: [], _id: false },
-    userStats: { type:Array, default: [], _id: false },
-    _id: false
-  }],
+  userRank: {
+    type: Map,
+    of: {
+      solo: {},
+      duo: {},
+      squad: {},
+      _id: false
+    },
+    default: {}
+  },
+  userStats: {
+    type: Map,
+    of: Array,
+    default: {}
+  },
   recentGames: { type:Array, default: [], _id: false },
   collectedGameId: {
     type: Map,
@@ -54,9 +60,15 @@ User.statics.update = function (userDoc, newData) {
     userDoc.markModified('beforeNickname');
   }
   
-  if(newData.userRankStat){
-    userDoc.userRankStat.push(newData.userRankStat);
-    userDoc.markModified('userRankStat');
+  if(newData.userRank){
+    const seasonId = newData.userRank.seasonId;
+    userDoc.userRank.set(seasonId, newData.userRank.rank);
+    userDoc.markModified('userRank');
+  }
+  if(newData.userStats){
+    const seasonId = newData.userStats.seasonId;
+    userDoc.userStats.set(seasonId, newData.userStats.userStats);
+    userDoc.markModified('userStats');
   }
 
   if(newData.collectedGameId){
@@ -79,5 +91,29 @@ User.statics.update = function (userDoc, newData) {
   
   return userDoc.save();
 };
+
+// User.statics.upsert = function (userNum, userData){
+//   const filter = { userNum };
+//   let update = {};
+//   if(userData.nickname){
+//     Object.assign(update, { nickname: userData.nickname });
+//     if(userData.nickname !== '##UNKNOWN##')
+//       Object.assign(update, { $push: {
+//         beforeNickname: {
+//           firstSeenAt: Date(),
+//           nickname: userData.nickname
+//         }
+//       } });
+//   }
+//   if(userData.userRank){
+//     const seasonId = userData.userRank.seasonId;
+//     // 게터세터 어캄??
+//   }
+//   return User.findOneAndUpdate(filter, update, {
+//     new: true,
+//     upsert: true,
+//     lean: true // 되나?
+//   }).exec();
+// };
 
 export default mongoose.model('User', User);

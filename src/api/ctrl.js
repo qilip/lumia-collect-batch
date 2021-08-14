@@ -44,14 +44,15 @@ export async function getUserRank(userNum, seasonId){
     return res;
   }
   if(res.statusCode === 200){
+    let userRank = {
+      seasonId: seasonId.toString(),
+      rank: {}
+    };
+    if(res.data.solo) userRank.rank.solo = res.data.solo;
+    if(res.data.duo) userRank.rank.duo = res.data.duo;
+    if(res.data.squad) userRank.rank.squad = res.data.squad;
     const saved = await User.update(user, {
-      userRankStat: {
-        updatedAt: Date.now(),
-        seasonId: res.data.seasonId,
-        solo: res.data.solo,
-        duo: res.data.duo,
-        squad: res.data.squad
-      }
+      userRank
     });
     if(saved) console.log(userNum + ' season: ' + seasonId + ' userRank saved');
   }else{
@@ -71,12 +72,13 @@ export async function getUserStats(userNum, seasonId){
     return res;
   }
   if(res.erCode === 200){
+    let userStats = {
+      seasonId: seasonId.toString(),
+      userStats: []
+    };
+    if(res.data.userStats) userStats.userStats = res.data.userStats;
     const saved = await User.update(user, {
-      userRankStat: {
-        updatedAt: Date.now(),
-        seasonId: res.data.seasonId,
-        userStats: res.data.userStats
-      }
+      userStats
     });
     if(saved) console.log(userNum + ' season: ' + seasonId + ' userStats saved');
   }else{
@@ -96,15 +98,22 @@ export async function getUserSeason(userNum, seasonId){
     console.error(e);
   }
   if(res.statusCode === 200){
+    let userRank = {
+      seasonId: seasonId.toString(),
+      rank: {}
+    };
+    if(res.data.solo) userRank.rank.solo = res.data.solo;
+    if(res.data.duo) userRank.rank.duo = res.data.duo;
+    if(res.data.squad) userRank.rank.squad = res.data.squad;
+    
+    let userStats = {
+      seasonId: seasonId.toString(),
+      userStats: []
+    };
+    if(res.data.userStats) userStats.userStats = res.data.userStats;
     const saved = await User.update(user, {
-      userRankStat: {
-        updatedAt: Date.now(),
-        seasonId: res.data.seasonId,
-        solo: res.data.solo,
-        duo: res.data.duo,
-        squad: res.data.squad,
-        userStats: res.data.userStats
-      }
+      userRank,
+      userStats
     });
     if(saved) console.log(userNum + ' season: ' + seasonId + ' userSeason saved');
   }else{
@@ -126,7 +135,7 @@ export async function getUserGames(userNum, start){
   if(res.erCode === 200){
     const recentGames = res.data.games;
     const gameCount = recentGames.length-1;
-    if(gameCount) user.collectedGameId.set(start.toString(), 'y');
+    if(gameCount && start) user.collectedGameId.set(start.toString(), 'y');
     const collectedGameId = recentGames.map((game, idx) => {
       return {
         gameId: game.gameId.toString(),

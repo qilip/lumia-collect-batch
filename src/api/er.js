@@ -66,10 +66,11 @@ export async function getUserRank(userNum, seasonId){
       (res, idx) => {
         if(res.status === 'fulfilled'){
           console.log('getUserRank[' + idx + '] Response Time:' + res.value.duration);
-          return res.value.data;
+          return res.value.data.userRank || null;
         }else{
           console.log('getUserRank[' + idx + '] Fail Response Time:' + res.reason.duration);
-          return { 'code': 500, 'message': 'axios request fail' };
+          console.log(res.reason.data.message);
+          return null;
         }
       }
     );
@@ -253,11 +254,11 @@ export async function getUserSeason(userNum, seasonId){
       (res, idx) => {
         if(res.status === 'fulfilled'){
           console.log('getUserSeason[' + idx + '] Response Time:' + res.value.duration);
-          return res.value.data;
+          return res.value.data.userRank || null;
         }else{
           console.log('getUserSeason[' + idx + '] Fail Response Time:' + res.reason.duration);
           console.log(res.reason.data.message);
-          return { 'code': 500, 'message': 'axios request error' };
+          return null;
         }
       }
     );

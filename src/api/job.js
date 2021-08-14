@@ -1,3 +1,4 @@
+import Bottleneck from 'bottleneck';
 import * as ctrl from './ctrl.js';
 import Queue from '../models/queue.js';
 import Schedule from '../models/schedule.js';
@@ -26,7 +27,25 @@ const funcWeight = {
   getFreeCharacters: p => 1,
 };
 
-export async function queue(limiter){
+const baseLimiter = new Bottleneck({
+  reservoir: 100,
+  reservoirIncreaseAmount: 50,
+  reservoirIncreaseInterval: 1000,
+  reservoirIncreaseMaximum: 100,
+  maxConcurrent: 30,
+  minTime: 50,
+});
+
+const lockLimiter = new Bottleneck.Group({
+  reservoir: 100,
+  reservoirIncreaseAmount: 50,
+  reservoirIncreaseInterval: 1000,
+  reservoirIncreaseMaximum: 100,
+  maxConcurrent: 1,
+  minTime: 50,
+});
+
+export async function queue(){
   let lockTime = new Date();
   lockTime.setMinutes(lockTime.getMinutes() - 10); // 락 걸린 이후로 10분이상 처리안된거
   let job;
@@ -42,33 +61,63 @@ export async function queue(limiter){
   }catch(e){
     console.error(e);
   }
+  const fName = job.jobFuncName;
+  let res = null;
   job.data.map(async (param, idx) => {
+    const limitOption = {
+      priority: job.priority,
+      weight: funcWeight[fName](param),
+      expiration: 30000,
+      id: job._id + '-' + idx,
+    };
     try{
-      const res = await limiter.schedule({
-        priority: job.priority,
-        weight: funcWeight[job.jobFuncName](param),
-        expiration: 30000,
-        id: job._id,
-      }, () => funcMapper[job.jobFuncName](param));
+      // User DB 동시수정 땜빵처리, atomic 하게 되면 지우기
+      if(fName.includes('getUser') && !fName.includes('Num')){
+        limitOption.weight = 1;
+        res = await lockLimiter.key(param.userNum.toString()).schedule(
+                    limitOption,
+                    () => funcMapper[fName](param));
+      }else
+        res = await baseLimiter.schedule(limitOption,
+                    () => funcMapper[fName](param));
       if(res) throw res;
-      await Queue.finished(job);
     }catch(e){
-      await Queue.unlock(job);
+      // await Queue.unlock(job); // 디버깅용
       console.error(e);
       console.error('JOB: ' + job);
     }
   });
+  if(!res) await Queue.finished(job);
 }
 
-export async function schedule(limiter){
+export async function schedule(){
   const job = await Schedule.findOne({}).sort({ priority: -1, nextRunAt: -1 }).exec();
 }
 
-export async function idle(limiter){
-  
+export async function idle(){
+  if(baseLimiter.empty()){
+  Queue.deleteFinished();
+  // console.log('Finished queue deleted');
+  }
+  // idle work
 }
 
-export async function cleanupQueue(){
-  await Queue.deleteFinished();
-  console.log('Finished queue deleted');
-}
+baseLimiter.on('error', (error) => {
+  console.error('baseLimiter: ERROR');
+  console.error(error);
+});
+
+baseLimiter.on('failed', (error, jobInfo) => {
+  console.warn('baseLimiter: Job [ ' + JSON.stringify(jobInfo, 0, 2) + ' ] Failed');
+  console.warn(error);
+});
+
+lockLimiter.on('error', (error) => {
+  console.error('lockLimiter: ERROR');
+  console.error(error);
+});
+
+lockLimiter.on('failed', (error, jobInfo) => {
+  console.warn('lockLimiter: Job [ ' + JSON.stringify(jobInfo, 0, 2) + ' ] Failed');
+  console.warn(error);
+});
