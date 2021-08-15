@@ -7,6 +7,7 @@ export default async () => {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
+        useFindAndModify: false,
         serverSelectionTimeoutMS: 5000
       })
       .then(console.log('MongoDB Connected'));

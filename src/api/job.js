@@ -1,7 +1,9 @@
 import Bottleneck from 'bottleneck';
+import * as er from './er.js';
 import * as ctrl from './ctrl.js';
 import Queue from '../models/queue.js';
 import Schedule from '../models/schedule.js';
+import Metadata from '../models/metadata.js';
 
 const funcMapper = {
   getUserNum: p => ctrl.getUserNum(p.nickname),
@@ -32,7 +34,7 @@ const baseLimiter = new Bottleneck({
   reservoirIncreaseAmount: 50,
   reservoirIncreaseInterval: 1000,
   reservoirIncreaseMaximum: 100,
-  maxConcurrent: 30,
+  maxConcurrent: 40,
   minTime: 50,
 });
 
@@ -67,7 +69,7 @@ export async function queue(){
     const limitOption = {
       priority: job.priority,
       weight: funcWeight[fName](param),
-      expiration: 30000,
+      expiration: 6000000, // 10min
       id: job._id + '-' + idx,
     };
     try{
@@ -91,15 +93,124 @@ export async function queue(){
 }
 
 export async function schedule(){
-  const job = await Schedule.findOne({}).sort({ priority: -1, nextRunAt: -1 }).exec();
+  let lockTime = new Date();
+  lockTime.setMinutes(lockTime.getMinutes() - 10); // 락 걸린 이후로 10분이상 처리안된거
+  let job;
+  try{
+  job = await Schedule.findOne({})
+                    .lt('nextRunAt', new Date())
+                    .lt('lockedAt', lockTime)
+                    .sort({ priority: -1, nextRunAt: -1 })
+                    .exec();
+  if(!job) return;
+  await Schedule.lock(job);
+  }catch(e){
+    console.error(e);
+  }
+  const fName = job.jobFuncName;
+  let res = null;
+  job.data.map(async (param, idx) => {
+    const limitOption = {
+      priority: job.priority,
+      weight: funcWeight[fName](param),
+      expiration: 6000000, // 10min
+      id: job._id + '-' + idx,
+    };
+    try{
+      // User DB 동시수정 땜빵처리, atomic 하게 되면 지우기
+      if(fName.includes('getUser') && !fName.includes('Num')){
+        limitOption.weight = 1;
+        res = await lockLimiter.key(param.userNum.toString()).schedule(
+                    limitOption,
+                    () => funcMapper[fName](param));
+      }else
+        res = await baseLimiter.schedule(limitOption,
+                    () => funcMapper[fName](param));
+      if(res) throw res;
+    }catch(e){
+      // await Queue.unlock(job); // 디버깅용
+      console.error(e);
+      console.error('Scheduled JOB: ' + job);
+    }
+  });
+  if(!res) await Schedule.finished(job);
 }
 
 export async function idle(){
-  if(baseLimiter.empty()){
-  Queue.deleteFinished();
+  if(!baseLimiter.empty() || await baseLimiter.running()) return;
+  await Queue.deleteFinished();
   // console.log('Finished queue deleted');
+  // 한번 호출(10초) 수집할 개수
+  const bulk = 100;
+  let gameId;
+  try{
+    gameId = await Metadata.findOne({dataName: 'gameId'}).exec();
+    if(!gameId){
+      console.log('create New gameId metadata');
+      //21-08-15 기준 대충 lower upper (의미없는 1인데이터 제외)
+      gameId = await Metadata.create({
+        dataName: 'gameId',
+        data: {
+          'lower': 8500000,
+          'upper': 10900000
+        }
+      });
+    }
+  }catch(e){
+    console.error(e);
   }
-  // idle work
+  if(!gameId.data.lower || !gameId.data.upper){
+    console.error('Metadata GameId ERROR');
+    return;
+  }
+  // lower 수집되면 갱신, upper는 유저데이터중 최신분으로 업뎃
+  let lower = gameId.data.lower;
+  let upper = gameId.data.upper;
+  // 수집할거 없을때 upper + 300 쳐서 수집되면 갱신
+  if(lower == upper){
+    try{
+      const randInt = Math.floor(Math.random()*99);
+      const res = er.getGame(upper + bulk + randInt );
+      if(res.statusCode == 200 && er.erCode == 200){
+        upper += bulk;
+        await Metadata.update('gameId', {
+          data: {
+            lower,
+            upper
+          }
+        });
+      }
+    }catch(e){
+      console.error(e);
+      return;
+    }
+  }
+  // 수집
+  const curId = Array.from(new Array(bulk), (c, i) => i + lower);
+  const req = curId.map(id => baseLimiter.schedule({
+    priority: 8,
+      weight: 1,
+      expiration: 6000000, // 10min
+      id: 'idleCollectGame' + '-' + id,
+  }, () => ctrl.getGame(id)));
+  
+  try{
+    await Promise.all(req);
+  }catch(e){
+    console.log(e);
+    return;
+  }
+  
+  try{
+    await Metadata.update('gameId', {
+      data: {
+        lower: Math.min(lower+bulk, upper),
+        upper
+      }
+    });
+  }catch(e){
+    console.error(e);
+  }
 }
 
 baseLimiter.on('error', (error) => {

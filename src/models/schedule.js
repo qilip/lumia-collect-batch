@@ -19,4 +19,22 @@ Schedule.statics.create = async function (ScheduleData) {
   return Schedule.save();
 };
 
+Schedule.statics.lock = async function (job) {
+  job.lockedAt = new Date();
+  return job.save();
+};
+
+Schedule.statics.unlock = async function (job) {
+  job.lockedAt = new Date(2000, 6, 8);
+  return job.save();
+};
+
+Schedule.statics.finished = async function (job) {
+  let nextRunTime = new Date();
+  nextRunTime.setMinutes(nextRunTime.getMinutes() + job.interval);
+  job.lastFinishedAt = new Date();
+  job.nextRunAt = nextRunTime;
+  return job.save();
+};
+
 export default mongoose.model('Schedule', Schedule);

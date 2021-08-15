@@ -24,7 +24,7 @@ const User = new Schema({
     of: Array,
     default: {}
   },
-  recentGames: { type:Array, default: [], _id: false },
+  recentGames: { type: Array, default: [], _id: false },
   collectedGameId: {
     type: Map,
     of: String,

@@ -232,3 +232,23 @@ export async function getFreeCharacters(matchingMode){
     return res;
   }
 }
+
+export async function getUserUpdate(){
+  // userSeason 현재시즌, userStat 일겜, 최근경기
+}
+
+export async function getUserAllGame(){
+  // 수집된 게임까지 전체수집
+}
+
+export async function getTopRank(){
+  // 랭킹
+}
+
+export async function getRecommendRoute(){
+  // 추천 루트목록
+}
+
+export async function getGamedata(){
+  // 게임 메타데이터
+}

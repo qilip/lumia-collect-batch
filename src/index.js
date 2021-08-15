@@ -7,32 +7,39 @@ import * as job from './api/job.js';
 // Connect MongoDB
 await connect();
 
-import Queue from './models/queue.js';
+// import Queue from './models/queue.js';
 
-Queue.create({
-  jobFuncName: 'getUserSeason',
-  priority: 5,
-  data: [
-    { userNum: 2773385, seasonId: 5 },
-    { userNum: 2773385, seasonId: 4 },
-    { userNum: 2773385, seasonId: 3 },
-    { userNum: 2773385, seasonId: 2 },
-    { userNum: 2773385, seasonId: 1 }
-  ]
-});
+// Queue.create({
+//   jobFuncName: 'getUserSeason',
+//   priority: 5,
+//   data: [
+//     { userNum: 2773385, seasonId: 5 },
+//     { userNum: 2773385, seasonId: 4 },
+//     { userNum: 2773385, seasonId: 3 },
+//     { userNum: 2773385, seasonId: 2 },
+//     { userNum: 2773385, seasonId: 1 }
+//   ]
+// });
 
-Queue.create({
-  jobFuncName: 'getUserStats',
-  priority: 4,
-  data: [
-    { userNum: 2773385, seasonId: 0 }
-  ]
-});
+// Queue.create({
+//   jobFuncName: 'getUserStats',
+//   priority: 4,
+//   data: [
+//     { userNum: 2773385, seasonId: 0 }
+//   ]
+// });
 
-import * as ctrl from './api/ctrl.js';
-// await ctrl.getUserNum('김해사는그남자');
-// await ctrl.getUserRank(1018085, 5);
-// await ctrl.getUserSeason(2773385, 3);
+// import Schedule from './models/schedule.js';
+
+// Schedule.create({
+//   jobFuncName: 'getUserSeason',
+//   priority: 4,
+//   interval: 24*60,
+//   data: [
+//     { userNum: 2773385 }
+//   ],
+//   nextRunAt: new Date(1999,6,8)
+// });
 
 cron.schedule('* * * * * *', () => {
   job.queue();
@@ -42,7 +49,8 @@ cron.schedule('* * * * *', () => {
   job.schedule();
 });
 
-cron.schedule('* * * * *', () => {
+cron.schedule('*/3 * * * * *', () => {
+  // 20초에 한번
   job.idle();
 });
 

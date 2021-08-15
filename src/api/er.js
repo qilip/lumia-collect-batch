@@ -144,7 +144,7 @@ export async function getGame(gameId){
   if(!gameId) return { 'statusCode': 400, 'message': 'parameter empty' };
   try{
     const res = await er.get('/games/' + gameId);
-    console.log('getGame Response Time: ' + res.duration);
+    // console.log('getGame Response Time: ' + res.duration);
     return {
       'erCode': res.data.code,
       'message': res.data.message,
