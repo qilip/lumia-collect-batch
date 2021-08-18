@@ -15,6 +15,7 @@ const funcMapper = {
   getGame: p => ctrl.getGame(p.gameId),
   getRoute: p => ctrl.getRoute(p.routeId),
   getFreeCharacters: p => ctrl.getFreeCharacters(p.matchingMode),
+  getGameData: p => ctrl.getGameData(p.metaType),
 };
 
 const funcWeight = {
@@ -27,6 +28,7 @@ const funcWeight = {
   getGame: p => 1,
   getRoute: p => 1,
   getFreeCharacters: p => 1,
+  getGameData: p => 1,
 };
 
 const baseLimiter = new Bottleneck({
@@ -140,8 +142,9 @@ export async function idle(){
   if(!baseLimiter.empty() || await baseLimiter.running()) return;
   await Queue.deleteFinished();
   // console.log('Finished queue deleted');
-  // 한번 호출(10초) 수집할 개수
-  const bulk = 100;
+  // 한번 호출마다 수집할 개수
+  const bulk = parseInt(process.env.BULK, 10) || -1;
+  if(bulk <= 0) return;
   let gameId;
   try{
     gameId = await Metadata.findOne({dataName: 'gameId'}).exec();
@@ -152,7 +155,7 @@ export async function idle(){
         dataName: 'gameId',
         data: {
           'lower': 8500000,
-          'upper': 10900000
+          'upper': 10950000
         }
       });
     }
@@ -166,13 +169,13 @@ export async function idle(){
   // lower 수집되면 갱신, upper는 유저데이터중 최신분으로 업뎃
   let lower = gameId.data.lower;
   let upper = gameId.data.upper;
-  // 수집할거 없을때 upper + 300 쳐서 수집되면 갱신
-  if(lower == upper){
+  // 수집할거 없을때 upper + bulk + random 쳐서 수집되면 갱신
+  if(lower === upper){
     try{
       const randInt = Math.floor(Math.random()*99);
       const res = er.getGame(upper + bulk + randInt );
       if(res.statusCode == 200 && er.erCode == 200){
-        upper += bulk;
+        upper += bulk + randInt;
         await Metadata.update('gameId', {
           data: {
             lower,
@@ -180,6 +183,7 @@ export async function idle(){
           }
         });
       }
+      return;
     }catch(e){
       console.error(e);
       return;
@@ -189,9 +193,9 @@ export async function idle(){
   const curId = Array.from(new Array(bulk), (c, i) => i + lower);
   const req = curId.map(id => baseLimiter.schedule({
     priority: 8,
-      weight: 1,
-      expiration: 6000000, // 10min
-      id: 'idleCollectGame' + '-' + id,
+    weight: 1,
+    expiration: 6000000, // 10min
+    id: 'idleCollectGame' + '-' + id,
   }, () => ctrl.getGame(id)));
   
   try{

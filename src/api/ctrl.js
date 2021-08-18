@@ -3,6 +3,11 @@ import User from '../models/user.js';
 import Game from '../models/game.js';
 import Route from '../models/route.js';
 import FreeCharacter from '../models/freeCharacter.js';
+import GameData from '../models/gameData.js';
+
+async function getCurrentSeason(){
+  
+}
 
 export async function getUserNum(nickname){
   const existNickname = await User.findByNickname(nickname);
@@ -249,6 +254,20 @@ export async function getRecommendRoute(){
   // 추천 루트목록
 }
 
-export async function getGamedata(){
-  // 게임 메타데이터
+export async function getGameData(metaType){
+  let res;
+  try{
+    res = await er.getGameData(metaType);
+  }catch(e){
+    console.error(e);
+  }
+  if(res.erCode === 200){
+    const saved = await GameData.create({
+      metaType: metaType,
+      data: res.data
+    });
+    if(saved) console.log(metaType + ' GameData saved or updated');
+  }else{
+    return res;
+  }
 }
