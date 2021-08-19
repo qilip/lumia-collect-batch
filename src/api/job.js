@@ -16,6 +16,7 @@ const funcMapper = {
   getRoute: p => ctrl.getRoute(p.routeId),
   getFreeCharacters: p => ctrl.getFreeCharacters(p.matchingMode),
   getGameData: p => ctrl.getGameData(p.metaType),
+  getUserUpdate: p => ctrl.getUserUpdate(p.userNum),
 };
 
 const funcWeight = {
@@ -29,6 +30,7 @@ const funcWeight = {
   getRoute: p => 1,
   getFreeCharacters: p => 1,
   getGameData: p => 1,
+  getUserUpdate: p => 6
 };
 
 const baseLimiter = new Bottleneck({

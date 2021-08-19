@@ -5,7 +5,7 @@ import Route from '../models/route.js';
 import FreeCharacter from '../models/freeCharacter.js';
 import GameData from '../models/gameData.js';
 
-export async function getCurrentSeason(){
+async function getCurrentSeason(){
   let season = await GameData.findByMetaType('Season');
   if(!season){
     try{
@@ -58,6 +58,8 @@ export async function getUserNum(nickname){
 }
 
 export async function getUserRank(userNum, seasonId){
+  if(seasonId === undefined || seasonId === null)
+    seasonId = await getCurrentSeason();
   let user = await User.findByUserNum(userNum);
   if(!user){
     user = await User.create({ nickname:'##UNKNOWN##', userNum });
@@ -86,6 +88,8 @@ export async function getUserRank(userNum, seasonId){
 }
 
 export async function getUserStats(userNum, seasonId){
+  if(seasonId === undefined || seasonId === null)
+    seasonId = await getCurrentSeason();
   let user = await User.findByUserNum(userNum);
   if(!user){
     user = await User.create({ nickname:'##UNKNOWN##', userNum });
@@ -112,6 +116,8 @@ export async function getUserStats(userNum, seasonId){
 }
 
 export async function getUserSeason(userNum, seasonId){
+  if(seasonId === undefined || seasonId === null)
+    seasonId = await getCurrentSeason();
   let user = await User.findByUserNum(userNum);
   if(!user){
     user = await User.create({ nickname:'##UNKNOWN##', userNum });
@@ -258,12 +264,21 @@ export async function getFreeCharacters(matchingMode){
   }
 }
 
-export async function getUserUpdate(){
+export async function getUserUpdate(userNum){
   // userSeason 현재시즌, userStat 일겜, 최근경기
+  const seasonId = await getCurrentSeason();
+  try{
+    // User 동시수정 문제때문에 순차수집 아몰랑 나중에 고쳐
+    await getUserSeason(userNum, seasonId);
+    await getUserStats(userNum, 0);
+    await getUserGames(userNum);
+  }catch(e){
+    console.error(e);
+  }
 }
 
 export async function getUserAllGame(){
-  // 수집된 게임까지 전체수집
+  // 수집된 게임까지, n 있으면 그 뒤도 채워서 전체수집
 }
 
 export async function getTopRank(){

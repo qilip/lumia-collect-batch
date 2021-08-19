@@ -1,54 +1,15 @@
 import cron from 'node-cron';
 import connect from './connectdb.js';
+import createJob from './createJob.js';
 import * as job from './api/job.js';
-import * as ctrl from './api/ctrl.js';
-import * as er from './api/er.js';
+// import * as ctrl from './api/ctrl.js';
+// import * as er from './api/er.js';
 
 // Connect MongoDB
 await connect();
 
-// import Queue from './models/queue.js';
-// import Schedule from './models/schedule.js';
-
-// Queue.create({
-//   jobFuncName: 'getUserSeason',
-//   priority: 5,
-//   data: [
-//     { userNum: 2773385, seasonId: 5 },
-//     { userNum: 2773385, seasonId: 4 },
-//     { userNum: 2773385, seasonId: 3 },
-//     { userNum: 2773385, seasonId: 2 },
-//     { userNum: 2773385, seasonId: 1 }
-//   ]
-// });
-
-// Queue.create({
-//   jobFuncName: 'getUserStats',
-//   priority: 4,
-//   data: [
-//     { userNum: 2773385, seasonId: 0 }
-//   ]
-// });
-
-// Schedule.create({
-//   jobFuncName: 'getUserSeason',
-//   priority: 4,
-//   interval: 24*60,
-//   data: [
-//     { userNum: 2773385 }
-//   ],
-//   nextRunAt: new Date(1999,6,8)
-// });
-
-// Schedule.create({
-//   jobFuncName: 'getGameData',
-//   priority: 4,
-//   interval: 24*60,
-//   data: [
-//     { metaType: 'Season' }
-//   ],
-//   nextRunAt: new Date(1999,6,8)
-// });
+// DB에 조건 맞을때만 실행하도록 설정
+// await createJob();
 
 cron.schedule('* * * * * *', () => {
   job.queue();
@@ -60,7 +21,7 @@ cron.schedule('* * * * *', () => {
 
 cron.schedule('*/3 * * * * *', () => {
   // 3초마다
-  job.idle();
+  // job.idle();
 });
 
 // await ctrl.getFreeCharacters(2);
@@ -74,5 +35,3 @@ cron.schedule('*/3 * * * * *', () => {
 // await ctrl.getUserGames(2773385, 10544019);
 // await ctrl.getUserRecentGames(2773385, 9974987, 50);
 // await ctrl.getGameData('Season');
-
-// console.log(await ctrl.getCurrentSeason());
