@@ -170,7 +170,7 @@ export async function idle(){
   let lower = gameId.data.lower;
   let upper = gameId.data.upper;
   // 수집할거 없을때 upper + bulk + random 쳐서 수집되면 갱신
-  if(lower === upper){
+  if(lower+bulk >= upper){
     try{
       const randInt = Math.floor(Math.random()*99);
       const res = er.getGame(upper + bulk + randInt );
@@ -208,8 +208,8 @@ export async function idle(){
   try{
     await Metadata.update('gameId', {
       data: {
-        lower: Math.min(lower+bulk, upper),
-        upper
+        lower: lower+bulk,
+        upper: upper
       }
     });
   }catch(e){

@@ -8,7 +8,7 @@ import * as er from './api/er.js';
 await connect();
 
 // import Queue from './models/queue.js';
-import Schedule from './models/schedule.js';
+// import Schedule from './models/schedule.js';
 
 // Queue.create({
 //   jobFuncName: 'getUserSeason',
@@ -74,3 +74,5 @@ cron.schedule('*/3 * * * * *', () => {
 // await ctrl.getUserGames(2773385, 10544019);
 // await ctrl.getUserRecentGames(2773385, 9974987, 50);
 // await ctrl.getGameData('Season');
+
+// console.log(await ctrl.getCurrentSeason());
