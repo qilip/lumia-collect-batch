@@ -303,3 +303,41 @@ export async function getGameData(metaType){
     };
   }
 }
+
+export async function getTopRank(seasonId, matchingTeamMode){
+  // 랭킹
+}
+
+export async function getRecommendRoute(){
+  // 추천 루트목록
+}
+
+export async function getL10nData(language){
+  // TODO: 버전 추출?
+  if(!language)
+    return { 'statusCode': 400, 'message': 'parameter empty' };
+  try{
+    const res = await er.get('/l10n/' + language);
+    console.log('getL10nData Response Time: ' + res.duration);
+    let l10nData = null;
+    if(res.data.code === 200){
+      l10nData = await axios.get(
+        res.data.data.l10Path,
+        { timeout: 4000 }
+      );
+    }
+    return {
+      'erCode': l10nData.status || res.data.code,
+      'message': l10nData.statusText || res.data.message,
+      'data': {
+        'data': l10nData.data
+      }
+    };
+  }catch(e){
+    console.error(e);
+    return {
+      'statusCode': 500,
+      'message': 'Lumia Collect server error'
+    };
+  }
+}

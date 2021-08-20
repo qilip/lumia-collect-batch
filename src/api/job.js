@@ -17,6 +17,10 @@ const funcMapper = {
   getFreeCharacters: p => ctrl.getFreeCharacters(p.matchingMode),
   getGameData: p => ctrl.getGameData(p.metaType),
   getUserUpdate: p => ctrl.getUserUpdate(p.userNum),
+  getUserAllGame: p => ctrl.getUserAllGame(p.userNum),
+  getTopRank: p => ctrl.getTopRank(p.seasonId, p.matchingTeamMode),
+  getRecommendRoute: p => ctrl.getRecommendRoute(),
+  getL10nData: p => ctrl.getL10nData(p.language),
 };
 
 const funcWeight = {
@@ -25,12 +29,16 @@ const funcWeight = {
   getUserStats: p => 1,
   getUserSeason: p => 4,
   getUserGames: p => 1,
-  getUserRecentGames: p => parseInt(p.limit/10, 10),
+  getUserRecentGames: p => 1, // 어차피 한번에 하나 가져오니..
   getGame: p => 1,
   getRoute: p => 1,
   getFreeCharacters: p => 1,
   getGameData: p => 1,
-  getUserUpdate: p => 6
+  getUserUpdate: p => 6,
+  getUserAllGame: p => 1,
+  getTopRank: p => 1,
+  getRecommendRoute: p => 1,
+  getL10nData: p => 1,
 };
 
 const baseLimiter = new Bottleneck({
@@ -39,7 +47,7 @@ const baseLimiter = new Bottleneck({
   reservoirIncreaseInterval: 1000,
   reservoirIncreaseMaximum: 100,
   maxConcurrent: 40,
-  minTime: 50,
+  minTime: 10,
 });
 
 const lockLimiter = new Bottleneck.Group({
@@ -48,7 +56,7 @@ const lockLimiter = new Bottleneck.Group({
   reservoirIncreaseInterval: 1000,
   reservoirIncreaseMaximum: 100,
   maxConcurrent: 1,
-  minTime: 50,
+  minTime: 10,
 });
 
 export async function queue(){
@@ -152,12 +160,12 @@ export async function idle(){
     gameId = await Metadata.findOne({dataName: 'gameId'}).exec();
     if(!gameId){
       console.log('create New gameId metadata');
-      //21-08-15 기준 대충 lower upper (의미없는 1인데이터 제외)
+      //21-08-20 기준 대충 lower upper (의미없는 1인데이터 제외)
       gameId = await Metadata.create({
         dataName: 'gameId',
         data: {
           'lower': 8500000,
-          'upper': 10950000
+          'upper': 11000000
         }
       });
     }

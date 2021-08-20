@@ -277,11 +277,11 @@ export async function getUserUpdate(userNum){
   }
 }
 
-export async function getUserAllGame(){
+export async function getUserAllGame(userNum){
   // 수집된 게임까지, n 있으면 그 뒤도 채워서 전체수집
 }
 
-export async function getTopRank(){
+export async function getTopRank(seasonId, matchingTeamMode){
   // 랭킹
 }
 
@@ -302,6 +302,24 @@ export async function getGameData(metaType){
       data: res.data
     });
     if(saved) console.log(metaType + ' GameData saved or updated');
+  }else{
+    return res;
+  }
+}
+
+export async function getL10nData(language){
+  let res;
+  try{
+    res = await er.getL10nData(language);
+  }catch(e){
+    console.error(e);
+  }
+  if(res.erCode === 200){
+    const saved = await GameData.create({
+      metaType: 'l10n-' + language,
+      data: res.data
+    });
+    if(saved) console.log(language + ' l10n saved or updated');
   }else{
     return res;
   }
