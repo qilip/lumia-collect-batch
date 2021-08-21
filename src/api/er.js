@@ -304,8 +304,27 @@ export async function getGameData(metaType){
   }
 }
 
-export async function getTopRank(seasonId, matchingTeamMode){
+export async function getTopRanks(seasonId, matchingTeamMode){
   // 랭킹
+  if(!matchingTeamMode || seasonId === undefined || seasonId === null)
+    return { 'statusCode': 400, 'message': 'parameter empty' };
+  try{
+    const res = await er.get(`/rank/top/${seasonId}/${matchingTeamMode}`);
+    console.log('getTopRank Response Time: ' + res.duration);
+    return {
+      'erCode': res.data.code,
+      'message': res.data.message,
+      'data': {
+        'topRanks': res.data.topRanks
+      }
+    };
+  }catch(e){
+    console.error(e);
+    return {
+      'statusCode': 500,
+      'message': 'Lumia Collect server error'
+    };
+  }
 }
 
 export async function getRecommendRoute(){
@@ -313,7 +332,7 @@ export async function getRecommendRoute(){
 }
 
 export async function getL10nData(language){
-  // TODO: 버전 추출?
+  // TODO: 파일명의 버전정보 저장하기?
   if(!language)
     return { 'statusCode': 400, 'message': 'parameter empty' };
   try{

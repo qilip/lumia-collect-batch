@@ -4,6 +4,7 @@ import Game from '../models/game.js';
 import Route from '../models/route.js';
 import FreeCharacter from '../models/freeCharacter.js';
 import GameData from '../models/gameData.js';
+import TopRank from '../models/topRank.js';
 
 async function getCurrentSeason(){
   let season = await GameData.findByMetaType('Season');
@@ -281,8 +282,24 @@ export async function getUserAllGame(userNum){
   // 수집된 게임까지, n 있으면 그 뒤도 채워서 전체수집
 }
 
-export async function getTopRank(seasonId, matchingTeamMode){
+export async function getTopRanks(seasonId, matchingTeamMode){
   // 랭킹
+  if(seasonId === undefined || seasonId === null)
+    seasonId = await getCurrentSeason();
+  let res;
+  try{
+    res = await er.getTopRanks(seasonId, matchingTeamMode);
+  }catch(e){
+    console.error(e);
+  }
+  if(res.erCode === 200){
+    const saved = await TopRank.create({
+      seasonId,
+      matchingTeamMode,
+      topRanks: res.data.topRanks
+    });
+    if(saved) console.log(`seasonId ${seasonId}, matchingTeammode ${matchingTeamMode} TopRank saved or updated`);
+  }
 }
 
 export async function getRecommendRoute(){

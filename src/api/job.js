@@ -18,7 +18,7 @@ const funcMapper = {
   getGameData: p => ctrl.getGameData(p.metaType),
   getUserUpdate: p => ctrl.getUserUpdate(p.userNum),
   getUserAllGame: p => ctrl.getUserAllGame(p.userNum),
-  getTopRank: p => ctrl.getTopRank(p.seasonId, p.matchingTeamMode),
+  getTopRanks: p => ctrl.getTopRanks(p.seasonId, p.matchingTeamMode),
   getRecommendRoute: p => ctrl.getRecommendRoute(),
   getL10nData: p => ctrl.getL10nData(p.language),
 };
@@ -36,7 +36,7 @@ const funcWeight = {
   getGameData: p => 1,
   getUserUpdate: p => 6,
   getUserAllGame: p => 1,
-  getTopRank: p => 1,
+  getTopRanks: p => 1,
   getRecommendRoute: p => 1,
   getL10nData: p => 1,
 };
@@ -99,9 +99,10 @@ export async function queue(){
       // await Queue.unlock(job); // 디버깅용
       console.error(e);
       console.error('JOB: ' + job);
+      return;
     }
   });
-  if(!res) await Queue.finished(job);
+  await Queue.finished(job);
 }
 
 export async function schedule(){
@@ -140,12 +141,13 @@ export async function schedule(){
                     () => funcMapper[fName](param));
       if(res) throw res;
     }catch(e){
-      // await Queue.unlock(job); // 디버깅용
+      // await Schedule.unlock(job); // 디버깅용
       console.error(e);
       console.error('Scheduled JOB: ' + job);
+      return;
     }
   });
-  if(!res) await Schedule.finished(job);
+  await Schedule.finished(job);
 }
 
 export async function idle(){
