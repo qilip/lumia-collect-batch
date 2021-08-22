@@ -17,9 +17,9 @@ const funcMapper = {
   getFreeCharacters: p => ctrl.getFreeCharacters(p.matchingMode),
   getGameData: p => ctrl.getGameData(p.metaType),
   getUserUpdate: p => ctrl.getUserUpdate(p.userNum),
-  getUserAllGame: p => ctrl.getUserAllGame(p.userNum),
+  getUserGamesInRange: p => ctrl.getUserGamesInRange(p.userNum, p.start, p.end),
   getTopRanks: p => ctrl.getTopRanks(p.seasonId, p.matchingTeamMode),
-  getRecommendRoute: p => ctrl.getRecommendRoute(),
+  getRecommendRoute: p => ctrl.getRecommendRoute(p.start),
   getL10nData: p => ctrl.getL10nData(p.language),
 };
 
@@ -35,7 +35,7 @@ const funcWeight = {
   getFreeCharacters: p => 1,
   getGameData: p => 1,
   getUserUpdate: p => 6,
-  getUserAllGame: p => 1,
+  getUserGamesInRange: p => 1,
   getTopRanks: p => 1,
   getRecommendRoute: p => 1,
   getL10nData: p => 1,

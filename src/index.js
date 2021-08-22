@@ -38,3 +38,4 @@ cron.schedule('*/3 * * * * *', () => {
 // await ctrl.getGameData('Season');
 // await ctrl.getL10nData('Korean');
 // await ctrl.getTopRanks(5, 3);
+// await ctrl.getUserGamesInRange(2773385, null, 10949583);

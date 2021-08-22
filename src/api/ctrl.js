@@ -278,8 +278,37 @@ export async function getUserUpdate(userNum){
   }
 }
 
-export async function getUserAllGame(userNum){
-  // 수집된 게임까지, n 있으면 그 뒤도 채워서 전체수집
+export async function getUserGamesInRange(userNum, start, end){
+  // start 부터 end 까지 수집
+  let user = await User.findByUserNum(userNum);
+  if(!user){
+    user = await User.create({ nickname:'##UNKNOWN##', userNum });
+  }
+  let res;
+  try{
+    res = await er.getUserGamesInRange(userNum, start, end);
+  }catch(e){
+    console.error(e);
+  }
+  if(res.erCode === 200){
+    const recentGames = res.data.games;
+    const gameCount = recentGames.length-1;
+    if(start && gameCount) user.collectedGameId.set(start.toString(), 'y');
+    const collectedGameId = recentGames.map((game, idx) => {
+      return {
+        gameId: game.gameId.toString(),
+        hasNext: gameCount === idx ? 'n' : 'y'
+      };
+    });
+    if(res.data.last === true) collectedGameId[gameCount].hasNext = 'f';
+    const saved = await User.update(user, {
+      recentGames,
+      collectedGameId
+    });
+    if(saved) console.log(userNum + ' userGamesInRange saved');
+  }else{
+    return res;
+  }
 }
 
 export async function getTopRanks(seasonId, matchingTeamMode){
@@ -302,7 +331,7 @@ export async function getTopRanks(seasonId, matchingTeamMode){
   }
 }
 
-export async function getRecommendRoute(){
+export async function getRecommendRoute(start){
   // 추천 루트목록
 }
 

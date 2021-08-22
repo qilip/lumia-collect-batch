@@ -1,5 +1,5 @@
 // import Queue from './models/queue.js';
-import Schedule from './models/schedule.js';
+import Schedule from '../models/schedule.js';
 import metaTypeData from './metaTypes.js';
 
 export default async () => {
