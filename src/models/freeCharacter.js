@@ -8,10 +8,11 @@ const FreeCharacter = new Schema({
 
 FreeCharacter.statics.create = async function (freeCharactersData) {
   const sortedCharacters = freeCharactersData.characters.slice().sort((a,b)=>a-b);
-  const lastFreeCharacers = await this.findOne().sort({ _id: -1 }).lean().exec();
-  if(lastFreeCharacers &&
-    JSON.stringify(lastFreeCharacers.characters) === JSON.stringify(sortedCharacters)
-    && lastFreeCharacers.matchingMode === freeCharactersData.matchingMode
+  const lastFreeCharacters = await this.findOne({
+    matchingMode: freeCharactersData.matchingMode
+  }).sort({ _id: -1 }).lean().exec();
+  if(lastFreeCharacters &&
+    JSON.stringify(lastFreeCharacters.characters) === JSON.stringify(sortedCharacters)
   ){
     return;
   }else{

@@ -25,7 +25,6 @@ cron.schedule('*/3 * * * * *', () => {
 // import * as ctrl from './api/ctrl.js';
 // import * as er from './api/er.js';
 
-// await ctrl.getFreeCharacters(2);
 // await ctrl.getUserNum('화이트모카');
 // await ctrl.getGame(9628082);
 // await ctrl.getRoute(383558);
@@ -35,6 +34,7 @@ cron.schedule('*/3 * * * * *', () => {
 // await ctrl.getUserGames(2773385);
 // await ctrl.getUserGames(2773385, 10544019);
 // await ctrl.getUserRecentGames(2773385, 9974987, 50);
+// await ctrl.getFreeCharacters(2);
 // await ctrl.getGameData('Season');
 // await ctrl.getL10nData('Korean');
 // await ctrl.getTopRanks(5, 3);

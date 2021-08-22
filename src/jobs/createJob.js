@@ -1,4 +1,4 @@
-// import Queue from './models/queue.js';
+// import Queue from '../models/queue.js';
 import Schedule from '../models/schedule.js';
 import metaTypeData from './metaTypes.js';
 
