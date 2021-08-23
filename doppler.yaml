@@ -1,2 +1,3 @@
 setup:
   project: lumia-collect-batch
+  config: loc
