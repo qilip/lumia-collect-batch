@@ -235,7 +235,7 @@ baseLimiter.on('error', (error) => {
 });
 
 baseLimiter.on('failed', (error, jobInfo) => {
-  console.warn('baseLimiter: Job [ ' + JSON.stringify(jobInfo, 0, 2) + ' ] Failed');
+  console.warn('baseLimiter: Job Failed: ' + JSON.stringify(jobInfo, 0, 2));
   console.warn(error);
 });
 
@@ -245,6 +245,6 @@ lockLimiter.on('error', (error) => {
 });
 
 lockLimiter.on('failed', (error, jobInfo) => {
-  console.warn('lockLimiter: Job [ ' + JSON.stringify(jobInfo, 0, 2) + ' ] Failed');
+  console.warn('lockLimiter: Job Failed: ' + JSON.stringify(jobInfo, 0, 2));
   console.warn(error);
 });
