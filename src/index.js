@@ -9,6 +9,11 @@ await connect();
 // DB에 조건 맞을때만 실행하도록 설정
 await createJob();
 
+process.on('unhandledRejection', (error, promise) => {
+  console.log('unhandled promise rejection: ', promise);
+  console.log('error: ', error);
+});
+
 cron.schedule('* * * * * *', () => {
   job.queue();
 });

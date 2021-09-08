@@ -15,7 +15,6 @@ er.interceptors.request.use(
     return config;
   },
   (error) => {
-    
     return Promise.reject(error);
   }
 );
@@ -148,7 +147,7 @@ export async function getGame(gameId){
     return {
       'erCode': res.data.code,
       'message': res.data.message,
-      'data': { 
+      'data': {
         'gameId': gameId,
         'games': res.data.userGames
       }
@@ -169,7 +168,7 @@ export async function getRoute(routeId){
     console.log('getRoute Response Time: ' + res.duration);
     return {
       'erCode': res.data.code,
-      'message': res.data.message,      
+      'message': res.data.message,
       'data': {
         'routeId': routeId,
         'route': res.data.result
@@ -290,7 +289,7 @@ export async function getGameData(metaType){
     console.log('getGameData Response Time: ' + res.duration);
     return {
       'erCode': res.data.code,
-      'message': res.data.message,      
+      'message': res.data.message,
       'data': {
         'data': res.data.data
       }

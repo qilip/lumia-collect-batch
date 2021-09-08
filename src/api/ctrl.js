@@ -24,8 +24,8 @@ async function getCurrentSeason(){
       console.error(e);
     }
   }
-  
-  return season.data.data.find(cur => 
+
+  return season.data.data.find(cur =>
     new Date(cur.seasonStart) <= new Date() && new Date() <= new Date(cur.seasonEnd)
   ).seasonID;
 }
