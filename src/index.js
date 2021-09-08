@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import connect from './connectdb.js';
-import createJob from './jobs/createJob.js';
+import connect from './loader/connectdb.js';
+import createJob from './loader/createJob.js';
 import * as job from './api/job.js';
 
 // Connect MongoDB
