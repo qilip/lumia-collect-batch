@@ -1,4 +1,6 @@
 import er from './er/createAxios.js';
+import * as game from './er/getGame.js';
+import * as userGame from './er/userGame.js';
 
 export async function getUserNum(nickname){
   if(!nickname) return { 'statusCode': 400, 'message': 'parameter empty' };
@@ -80,52 +82,15 @@ export async function getUserStats(userNum, seasonId){
 }
 
 export async function getUserGames(userNum, start){
-  if(!userNum) return { 'statusCode': 400, 'message': 'parameter empty' };
-  try{
-    let res;
-    if(start){
-      res = await er.get('/user/games/' + userNum, { params: { next: start } });
-    }else{
-      res = await er.get('/user/games/' + userNum);
-    }
-    console.log('getUserGames Response Time: ' + res.duration);
-    return {
-      'erCode': res.data.code,
-      'message': res.data.message,
-      'data': {
-        'games': res.data.userGames,
-        'last': res.data.next > 0 ? false : true
-      }
-    };
-  }catch(e){
-    console.error(e);
-    return {
-      'statusCode': 500,
-      'message': 'Lumia Collect server error'
-    };
-  }
+  return userGame.getUserGames(userNum, start);
 }
 
 export async function getGame(gameId){
-  if(!gameId) return { 'statusCode': 400, 'message': 'parameter empty' };
-  try{
-    const res = await er.get('/games/' + gameId);
-    // console.log('getGame Response Time: ' + res.duration);
-    return {
-      'erCode': res.data.code,
-      'message': res.data.message,
-      'data': {
-        'gameId': gameId,
-        'games': res.data.userGames
-      }
-    };
-  }catch(e){
-    console.error(e);
-    return {
-      'statusCode': 500,
-      'message': 'Lumia Collect server error'
-    };
-  }
+  return game.getGame(gameId);
+}
+
+export async function getUserRecentGames(userNum, start, limit){
+  return userGame.getUserRecentGames(userNum, start, limit);
 }
 
 export async function getRoute(routeId){
@@ -165,43 +130,6 @@ export async function getFreeCharacters(matchingMode){
     return {
       'statusCode': 500,
       'message': 'Lumia Collect Server error'
-    };
-  }
-}
-
-
-export async function getUserRecentGames(userNum, start, limit){
-  if(!userNum || !limit) return { 'statusCode': 400, 'message': 'parameter empty' };
-  try{
-    let games = [];
-    let next = start;
-    let i = 0;
-    let res;
-    while(games.length < limit && next !== -1 && i < limit){
-      if(next){
-        res = await er.get('/user/games/' + userNum, { params: { next } });
-      }else{
-        res = await er.get('/user/games/' + userNum);
-      }
-      console.log('getUserGames[' + (i/10) + '] Response Time: ' + res.duration);
-      if(res.data.code !== 200) return { 'erCode': res.data.code, 'message': res.data.message };
-      games.push(...res.data.userGames);
-      next = res.data.next || -1;
-      i += 10;
-    }
-    return {
-      'erCode': res.data.code,
-      'message': res.data.message,
-      'data': {
-        'games': games,
-        'last': res.data.next > 0 ? false : true
-      }
-    };
-  }catch(e){
-    console.error(e);
-    return {
-      'statusCode': 500,
-      'message': 'Lumia Collect server error'
     };
   }
 }
@@ -271,39 +199,7 @@ export async function getGameData(metaType){
 }
 
 export async function getUserGamesInRange(userNum, start, end){
-  if(!userNum) return { 'statusCode': 400, 'message': 'parameter empty' };
-  try{
-    let games = [];
-    let next = start;
-    let res;
-    let loop = 0;
-    while(next === null || (next > end && next !== -1)){
-      if(next){
-        res = await er.get('/user/games/' + userNum, { params: { next } });
-      }else{
-        res = await er.get('/user/games/' + userNum);
-      }
-      console.log('getGamesInRange[' + loop + '] Response Time: ' + res.duration);
-      if(res.data.code !== 200) return { 'erCode': res.data.code, 'message': res.data.message };
-      games.push(...res.data.userGames);
-      next = res.data.next || -1;
-      loop++;
-    }
-    return {
-      'erCode': res.data.code,
-      'message': res.data.message,
-      'data': {
-        'games': games,
-        'last': res.data.next > 0 ? false : true
-      }
-    };
-  }catch(e){
-    console.error(e);
-    return {
-      'statusCode': 500,
-      'message': 'Lumia Collect server error'
-    };
-  }
+  return userGame.getUserGamesInRange(userNum, start, end);
 }
 
 export async function getTopRanks(seasonId, matchingTeamMode){

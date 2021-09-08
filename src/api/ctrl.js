@@ -137,7 +137,7 @@ export async function getUserSeason(userNum, seasonId){
     if(res.data.solo) userRank.rank.solo = res.data.solo;
     if(res.data.duo) userRank.rank.duo = res.data.duo;
     if(res.data.squad) userRank.rank.squad = res.data.squad;
-    
+
     let userStats = {
       seasonId: seasonId.toString(),
       userStats: []
