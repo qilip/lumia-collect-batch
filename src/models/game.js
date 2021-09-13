@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const Game = new Schema({
-  gameId: { type: Number, unique: true, required: true },
+  _id: Number,
+  gameId: Number,
   seasonId: Number,
   matchingMode: Number,
   matchingTeamMode: Number,
@@ -12,20 +13,23 @@ const Game = new Schema({
   startDtm: Date,
   botAdded: Number,
   mmrAvg: Number,
-  games: { type: Array },
-}, { timestamps: true, strict: false });
+  games: Array,
+  dataUpdatedAt: { type: Date, default: new Date() },
+}, { timestamps: true });
 
 Game.statics.findByGameId = function (gameId) {
-  return this.findOne({gameId}).exec();
+  return this.findById(gameId).exec();
 };
 
-Game.statics.create = async function (gameData) {
-  const existGame = await this.findOne({gameId:gameData.gameId}).exec();
+Game.statics.upsert = async function (newGame) {
+  const existGame = await this.findById(newGame.gameId).exec();
   if(existGame){
-    Object.assign(existGame, gameData);
+    Object.assign(existGame, newGame);
     return existGame.save();
   }
-  const game = new this(gameData);
+  newGame['_id'] = newGame.gameId;
+  newGame['dataUpdatedAt'] = new Date();
+  const game = new this(newGame);
   return game.save();
 };
 

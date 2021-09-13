@@ -225,7 +225,7 @@ export async function getGame(gameId){
     console.error(e);
   }
   if(res.erCode === 200){
-    const saved = await Game.create(res.data);
+    const saved = await Game.upsert(res.data);
     if(saved) console.log(gameId + ' gamedata saved or updated');
   }else{
     return res;

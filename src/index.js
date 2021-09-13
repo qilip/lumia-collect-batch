@@ -32,6 +32,7 @@ cron.schedule('*/3 * * * * *', () => {
 
 // await ctrl.getUserNum('화이트모카');
 // await ctrl.getGame(9628082);
+// await ctrl.getGame(11636212);
 // await ctrl.getRoute(383558);
 // await ctrl.getUserSeason(2773385, 5);
 // await ctrl.getUserRank(2773385, 4);
