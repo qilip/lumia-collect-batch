@@ -42,14 +42,13 @@ export async function getUserRank(userNum, seasonId){
         }
       }
     );
+    const userRank = [...data];
     return {
       'statusCode': 200,
       'message': 'Success',
       'data': {
         seasonId,
-        'solo': data[0],
-        'duo': data[1],
-        'squad': data[2]
+        userRank,
       }
     };
   }catch(e){
@@ -156,14 +155,13 @@ export async function getUserSeason(userNum, seasonId){
         }
       }
     );
+    const userRank = [data[0], data[1], data[2]];
     return {
       'statusCode': 200,
       'message': 'Success',
       'data': {
         seasonId,
-        'solo': data[0],
-        'duo': data[1],
-        'squad': data[2],
+        userRank,
         'userStats': data[3]
       }
     };

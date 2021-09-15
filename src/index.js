@@ -19,22 +19,23 @@ cron.schedule('* * * * * *', () => {
 });
 
 cron.schedule('*/10 * * * * *', () => {
-  job.schedule();
+  // job.schedule();
 });
 
 cron.schedule('*/3 * * * * *', () => {
   // 3초마다
-  job.idle();
+  // job.idle();
 });
 
-// import * as ctrl from './api/ctrl.js';
+import * as ctrl from './api/ctrl.js';
 // import * as er from './api/er.js';
 
 // await ctrl.getUserNum('화이트모카');
 // await ctrl.getGame(9628082);
-// await ctrl.getGame(11636212);
+// await ctrl.getGame(11636213);
 // await ctrl.getRoute(383558);
 // await ctrl.getUserSeason(2773385, 5);
+// await ctrl.getUserRank(2773385);
 // await ctrl.getUserRank(2773385, 4);
 // await ctrl.getUserStats(2773385, 0);
 // await ctrl.getUserGames(2773385);
@@ -44,4 +45,5 @@ cron.schedule('*/3 * * * * *', () => {
 // await ctrl.getGameData('Season');
 // await ctrl.getL10nData('Korean');
 // await ctrl.getTopRanks(5, 3);
-// await ctrl.getUserGamesInRange(2773385, null, 10949583);
+// await ctrl.getUserGamesInRange(2773385, null, 1);
+// await ctrl.getUserUpdate(2773385);

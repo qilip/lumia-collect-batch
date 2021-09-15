@@ -15,7 +15,7 @@ export async function getUserGames(userNum, start){
       'message': res.data.message,
       'data': {
         'games': res.data.userGames,
-        'last': res.data.next > 0 ? false : true
+        'isLast': res.data.next > 0 ? false : true
       }
     };
   }catch(e){
@@ -51,7 +51,7 @@ export async function getUserRecentGames(userNum, start, limit){
       'message': res.data.message,
       'data': {
         'games': games,
-        'last': res.data.next > 0 ? false : true
+        'isLast': res.data.next > 0 ? false : true
       }
     };
   }catch(e){
@@ -64,7 +64,8 @@ export async function getUserRecentGames(userNum, start, limit){
 }
 
 export async function getUserGamesInRange(userNum, start, end){
-  if(!userNum) return { 'statusCode': 400, 'message': 'parameter empty' };
+  if(!userNum || end === undefined || end === null)
+    return { 'statusCode': 400, 'message': 'parameter empty' };
   try{
     let games = [];
     let next = start;
@@ -87,7 +88,7 @@ export async function getUserGamesInRange(userNum, start, end){
       'message': res.data.message,
       'data': {
         'games': games,
-        'last': res.data.next > 0 ? false : true
+        'isLast': res.data.next > 0 ? false : true
       }
     };
   }catch(e){

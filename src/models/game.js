@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const Game = new Schema({
   _id: Number,
-  gameId: Number,
+  gameId: { type: Number, unique: true, required: true },
   seasonId: Number,
   matchingMode: Number,
   matchingTeamMode: Number,
