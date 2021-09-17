@@ -6,13 +6,13 @@ const Metadata = new Schema({
   data: { type: {}, _id: false }
 }, { timestamps: true, strict: false });
 
-Metadata.statics.create = async function (metaData) {
+Metadata.statics.upsert = async function (metaData) {
   
   const Metadata = new this(metaData);
   return Metadata.save();
 };
 
-Metadata.statics.update = async function (dataName, newData) {
+Metadata.statics.updateData = async function (dataName, newData) {
   // atomic 하게 바꾸기
   let update = {};
   if(newData){

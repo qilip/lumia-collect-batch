@@ -6,41 +6,9 @@ import GameData from '../models/gameData.js';
 import TopRank from '../models/topRank.js';
 
 // TODO: name Refactor
-import * as ctrlUtil from './ctrl/util.js';
-import * as ctrlGame from './ctrl/getGame.js';
-import * as ctrlUser from './ctrl/user.js';
-
-async function getCurrentSeason(){
-  return ctrlUtil.getCurrentSeason();
-}
-
-export async function getUserNum(nickname){
-  return ctrlUser.getUserNum(nickname);
-}
-
-export async function getUserRank(userNum, seasonId){
-  return ctrlUser.getUserRank(userNum, seasonId);
-}
-
-export async function getUserStats(userNum, seasonId){
-  return ctrlUser.getUserStats(userNum, seasonId);
-}
-
-export async function getUserSeason(userNum, seasonId){
-  return ctrlUser.getUserSeason(userNum, seasonId);
-}
-
-export async function getUserGames(userNum, start){
-  return ctrlUser.getUserGames(userNum, start);
-}
-
-export async function getUserRecentGames(userNum, start, limit){
-  return ctrlUser.getUserRecentGames(userNum, start, limit);
-}
-
-export async function getGame(gameId){
-  return ctrlGame.getGame(gameId);
-}
+export * from './ctrl/util.js';
+export * from './ctrl/getGame.js';
+export * from './ctrl/user.js';
 
 export async function getRoute(routeId){
   let res;
@@ -50,7 +18,7 @@ export async function getRoute(routeId){
     console.error(e);
   }
   if(res.erCode === 200){
-    const saved = await Route.create(res.data);
+    const saved = await Route.upsert(res.data);
     if(saved) console.log(routeId + ' route saved or updated');
   }else{
     return res;
@@ -65,7 +33,7 @@ export async function getFreeCharacters(matchingMode){
     console.error(e);
   }
   if(res.erCode === 200){
-    const saved = await FreeCharacter.create({
+    const saved = await FreeCharacter.upsert({
       matchingMode,
       characters: res.data.freeCharacters
     });
@@ -88,11 +56,6 @@ export async function getUserUpdate(userNum){
   }
 }
 
-export async function getUserGamesInRange(userNum, start, end){
-  // start 부터 end 까지 수집
-  return ctrlUser.getUserGamesInRange(userNum, start, end);
-}
-
 export async function getTopRanks(seasonId, matchingTeamMode){
   // 랭킹
   if(seasonId === undefined || seasonId === null)
@@ -104,7 +67,7 @@ export async function getTopRanks(seasonId, matchingTeamMode){
     console.error(e);
   }
   if(res.erCode === 200){
-    const saved = await TopRank.create({
+    const saved = await TopRank.upsert({
       seasonId,
       matchingTeamMode,
       topRanks: res.data.topRanks
@@ -125,7 +88,7 @@ export async function getGameData(metaType){
     console.error(e);
   }
   if(res.erCode === 200){
-    const saved = await GameData.create({
+    const saved = await GameData.upsert({
       metaType: metaType,
       data: res.data
     });
@@ -143,7 +106,7 @@ export async function getL10nData(language){
     console.error(e);
   }
   if(res.erCode === 200){
-    const saved = await GameData.create({
+    const saved = await GameData.upsert({
       metaType: 'l10n-' + language,
       data: res.data
     });

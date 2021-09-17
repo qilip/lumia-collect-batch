@@ -1,6 +1,6 @@
 # Lumia Collect - Batch
 
-배치 작업 처리
+Lumia Collect로 이름 바꿀까?
 
 doppler install
 

@@ -7,7 +7,7 @@ export async function getCurrentSeason(){
     try{
       const res = await er.getGameData('Season');
       if(res.erCode === 200){
-        season = await GameData.create({
+        season = await GameData.upsert({
           metaType: 'Season',
           data: res.data
         });

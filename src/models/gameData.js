@@ -10,7 +10,7 @@ GameData.statics.findByMetaType = function (metaType) {
   return this.findOne({metaType}).exec();
 };
 
-GameData.statics.create = async function (gameData) {
+GameData.statics.upsert = async function (gameData) {
   const existData = await this.findOne({metaType: gameData.metaType}).exec();
   if(existData){
     if(gameData) existData.data = gameData.data;

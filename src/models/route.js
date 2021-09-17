@@ -9,7 +9,7 @@ Route.statics.findByRouteId = function (routeId) {
   return this.findOne({routeId}).exec();
 };
 
-Route.statics.create = async function (routeData) {
+Route.statics.upsert = async function (routeData) {
   const existRoute = await this.findOne({routeId: routeData.routeId}).exec();
   if(existRoute){
     if(routeData.routeVersion && existRoute.routeVersion < routeData.routeVersion)

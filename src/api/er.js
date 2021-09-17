@@ -1,6 +1,8 @@
+import axios from 'axios';
 import er from './er/createAxios.js';
-import * as game from './er/getGame.js';
-import * as userGame from './er/userGame.js';
+
+export * from './er/getGame.js';
+export * from './er/userGame.js';
 
 export async function getUserNum(nickname){
   if(!nickname) return { 'statusCode': 400, 'message': 'parameter empty' };
@@ -78,18 +80,6 @@ export async function getUserStats(userNum, seasonId){
       'message': 'Lumia Collect server error'
     };
   }
-}
-
-export async function getUserGames(userNum, start){
-  return userGame.getUserGames(userNum, start);
-}
-
-export async function getGame(gameId){
-  return game.getGame(gameId);
-}
-
-export async function getUserRecentGames(userNum, start, limit){
-  return userGame.getUserRecentGames(userNum, start, limit);
 }
 
 export async function getRoute(routeId){
@@ -194,10 +184,6 @@ export async function getGameData(metaType){
       'message': 'Lumia Collect server error'
     };
   }
-}
-
-export async function getUserGamesInRange(userNum, start, end){
-  return userGame.getUserGamesInRange(userNum, start, end);
 }
 
 export async function getTopRanks(seasonId, matchingTeamMode){

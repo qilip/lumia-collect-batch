@@ -6,7 +6,7 @@ const FreeCharacter = new Schema({
   characters: [Number],
 }, { timestamps: true, strict: false });
 
-FreeCharacter.statics.create = async function (freeCharactersData) {
+FreeCharacter.statics.upsert = async function (freeCharactersData) {
   const sortedCharacters = freeCharactersData.characters.slice().sort((a,b)=>a-b);
   const lastFreeCharacters = await this.findOne({
     matchingMode: freeCharactersData.matchingMode

@@ -19,15 +19,15 @@ cron.schedule('* * * * * *', () => {
 });
 
 cron.schedule('*/10 * * * * *', () => {
-  // job.schedule();
+  job.schedule();
 });
 
 cron.schedule('*/3 * * * * *', () => {
   // 3초마다
-  // job.idle();
+  job.idle();
 });
 
-import * as ctrl from './api/ctrl.js';
+// import * as ctrl from './api/ctrl.js';
 // import * as er from './api/er.js';
 
 // await ctrl.getUserNum('화이트모카');

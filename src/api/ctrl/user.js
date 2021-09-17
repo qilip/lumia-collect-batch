@@ -39,8 +39,7 @@ export async function getUserNum(nickname){
 }
 
 export async function getUserRank(userNum, seasonId){
-  if(seasonId === undefined || seasonId === null)
-    seasonId = await getCurrentSeason();
+  seasonId = seasonId ?? await getCurrentSeason();
   let res;
   try{
     res = await er.getUserRank(userNum, seasonId);
@@ -65,8 +64,7 @@ export async function getUserRank(userNum, seasonId){
 }
 
 export async function getUserStats(userNum, seasonId){
-  if(seasonId === undefined || seasonId === null)
-    seasonId = await getCurrentSeason();
+  seasonId = seasonId ?? await getCurrentSeason();
   let res;
   try{
     res = await er.getUserStats(userNum, seasonId);
@@ -91,8 +89,7 @@ export async function getUserStats(userNum, seasonId){
 }
 
 export async function getUserSeason(userNum, seasonId){
-  if(seasonId === undefined || seasonId === null)
-    seasonId = await getCurrentSeason();
+  seasonId = seasonId ?? await getCurrentSeason();
   let res;
   try{
     res = await er.getUserSeason(userNum, seasonId);
