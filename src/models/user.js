@@ -68,10 +68,14 @@ User.statics.upsert = async function (data) {
     //최근 10게임만 저장
     let newGames = data.userGames.slice(0, 10);
     newGames.push(...user.userGames);
-    newGames.sort((a, b) => {
+    const uGames = newGames.reduce((acc, cur) => {
+      if(!acc.some(cu => cu.gameId === cur.gameId)) acc.push(cur);
+      return acc;
+    }, []);
+    uGames.sort((a, b) => {
       return b.gameId - a.gameId;
     });
-    user.userGames = newGames.slice(0, 10);
+    user.userGames = uGames.slice(0, 10);
   }
 
   user.dataUpdatedAt = new Date();

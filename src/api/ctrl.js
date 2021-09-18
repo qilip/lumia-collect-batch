@@ -10,6 +10,8 @@ export * from './ctrl/util.js';
 export * from './ctrl/getGame.js';
 export * from './ctrl/user.js';
 
+import { getCurrentSeason } from './ctrl/util.js';
+
 export async function getRoute(routeId){
   let res;
   try{
@@ -40,19 +42,6 @@ export async function getFreeCharacters(matchingMode){
     if(saved) console.log(matchingMode + ' FreeCharacter saved');
   }else{
     return res;
-  }
-}
-
-export async function getUserUpdate(userNum){
-  // userSeason 현재시즌, userStat 일겜, 최근경기
-  const seasonId = await getCurrentSeason();
-  try{
-    // User 동시수정 문제때문에 순차수집 아몰랑 나중에 고쳐
-    await getUserSeason(userNum, seasonId);
-    await getUserStats(userNum, 0);
-    await getUserGames(userNum);
-  }catch(e){
-    console.error(e);
   }
 }
 

@@ -3,9 +3,10 @@ import * as ctrl from './ctrl.js';
 import Queue from '../models/queue.js';
 import Schedule from '../models/schedule.js';
 import Metadata from '../models/metadata.js';
-import { baseLimiter, lockLimiter, baseJob, lockJob, limitOption } from './job/jobLimiter.js';
+import { baseLimiter, baseJob, limitOption } from './job/jobLimiter.js';
 
 export async function queue(){
+  if(!baseLimiter.empty() || await baseLimiter.running()) return;
   let lockTime = new Date();
   lockTime.setMinutes(lockTime.getMinutes() - 10); // 락 걸린 이후로 10분이상 처리안된거
   let job;
@@ -22,28 +23,25 @@ export async function queue(){
     console.error(e);
   }
   const jobName = job.jobName;
-  let res = null;
+  let error = false;
   job.data.map(async (param, idx) => {
     const option = limitOption(job, param, idx);
     try{
-      // User DB 동시수정 땜빵처리, atomic 하게 되면 지우기
-      if(jobName.includes('getUser') && !jobName.includes('Num')){
-        option.weight = 1;
-        res = await lockJob(option, jobName, param);
-      }else
-        res = await baseJob(option, jobName, param);
+      const res = await baseJob(option, jobName, param);
       if(res) throw res;
     }catch(e){
+      error = true;
       // await Queue.unlock(job); // 디버깅용
       console.error(e);
       console.error('JOB: ' + job);
       return;
     }
   });
-  if(!res) await Queue.finished(job);
+  if(!error) await Queue.finished(job);
 }
 
 export async function schedule(){
+  if(!baseLimiter.empty() || await baseLimiter.running()) return;
   let lockTime = new Date();
   lockTime.setMinutes(lockTime.getMinutes() - 10); // 락 걸린 이후로 10분이상 처리안된거
   let job;
@@ -59,25 +57,21 @@ export async function schedule(){
     console.error(e);
   }
   const jobName = job.jobName;
-  let res = null;
+  let error = false;
   job.data.map(async (param, idx) => {
     const option = limitOption(job, param, idx);
     try{
-      // User DB 동시수정 땜빵처리, atomic 하게 되면 지우기
-      if(jobName.includes('getUser') && !jobName.includes('Num')){
-        option.weight = 1;
-        res = await lockJob(option, jobName, param);
-      }else
-        res = await baseJob(option, jobName, param);
+      const res = await baseJob(option, jobName, param);
       if(res) throw res;
     }catch(e){
+      error = true;
       // await Schedule.unlock(job); // 디버깅용
       console.error(e);
       console.error('Scheduled JOB: ' + job);
       return;
     }
   });
-  if(!res) await Schedule.finished(job);
+  if(!error) await Schedule.finished(job);
 }
 
 export async function idle(){
@@ -165,15 +159,5 @@ baseLimiter.on('error', (error) => {
 
 baseLimiter.on('failed', (error, jobInfo) => {
   console.warn('baseLimiter: Job Failed: ' + JSON.stringify(jobInfo, 0, 2));
-  console.warn(error);
-});
-
-lockLimiter.on('error', (error) => {
-  console.error('lockLimiter: ERROR');
-  console.error(error);
-});
-
-lockLimiter.on('failed', (error, jobInfo) => {
-  console.warn('lockLimiter: Job Failed: ' + JSON.stringify(jobInfo, 0, 2));
   console.warn(error);
 });

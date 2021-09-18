@@ -1,15 +1,9 @@
 import * as er from '../er.js';
-import * as ctrlUtil from './util.js';
 import User from '../../models/user.js';
 import UserGame from '../../models/userGame.js';
 
-async function getCurrentSeason(){
-  return ctrlUtil.getCurrentSeason();
-}
-
-function getGamePreview(game){
-  return ctrlUtil.getGamePreview(game);
-}
+import { getCurrentSeason, getGamePreview, addGameQueue } from './util.js';
+import saveUser from './saveUser.js';
 
 export async function getUserNum(nickname){
   const existNickname = await User.findByNickname(nickname);
@@ -23,7 +17,7 @@ export async function getUserNum(nickname){
     const userNum = res.data.user.userNum;
     if(existNickname){
       if(existNickname.userNum !== userNum){
-        User.upsert({
+        saveUser({
           userNum: existNickname.userNum,
           nickname: '##UNKNOWN##',
         });
@@ -31,7 +25,7 @@ export async function getUserNum(nickname){
       return;
     }
 
-    const saved = await User.upsert({ nickname, userNum });
+    const saved = await saveUser({ nickname, userNum });
     if(saved) console.log(nickname + ' UserNum saved');
   }else{
     return res;
@@ -53,7 +47,7 @@ export async function getUserRank(userNum, seasonId){
     };
     if(res.data.userRank) userRank.rank = res.data.userRank;
     //TODO: 불필요한 정보 삭제
-    const saved = await User.upsert({
+    const saved = await saveUser({
       userNum,
       userRank,
     });
@@ -78,7 +72,7 @@ export async function getUserStats(userNum, seasonId){
     };
     // TODO: 불필요한 정보 삭제
     if(res.data.userStats) userStats.stats = res.data.userStats;
-    const saved = await User.upsert({
+    const saved = await saveUser({
       userNum,
       userStats,
     });
@@ -107,7 +101,7 @@ export async function getUserSeason(userNum, seasonId){
     };
     if(res.data.userRank) userRank.rank = res.data.userRank;
     if(res.data.userStats) userStats.stats = res.data.userStats;
-    const saved = await User.upsert({
+    const saved = await saveUser({
       userNum,
       userRank,
       userStats,
@@ -130,17 +124,17 @@ export async function getUserGames(userNum, start){
     const userGames = recentGames.map(game => {
       return getGamePreview(game);
     });
-    const gsaved = await UserGame.upsert({
+    const gameIds = recentGames.map(game => {
+      return { gameId: game.gameId };
+    });
+    addGameQueue(gameIds);
+    const saved = await saveUser({
       userNum,
       userGames,
       start,
       isLast: res.data.isLast,
     });
-    const saved = await User.upsert({
-      userNum,
-      userGames,
-    });
-    if(gsaved && saved) console.log(userNum + ' userGames saved');
+    if(saved) console.log(userNum + ' userGames saved');
   }else{
     return res;
   }
@@ -158,17 +152,17 @@ export async function getUserRecentGames(userNum, start, limit){
     const userGames = recentGames.map(game => {
       return getGamePreview(game);
     });
-    const gsaved = await UserGame.upsert({
+    const gameIds = recentGames.map(game => {
+      return { gameId: game.gameId };
+    });
+    addGameQueue(gameIds);
+    const saved = await saveUser({
       userNum,
       userGames,
       start,
       isLast: res.data.isLast,
     });
-    const saved = await User.upsert({
-      userNum,
-      userGames,
-    });
-    if(gsaved && saved) console.log(userNum + ' userRecentGames saved');
+    if(saved) console.log(userNum + ' userRecentGames saved');
   }else{
     return res;
   }
@@ -187,18 +181,31 @@ export async function getUserGamesInRange(userNum, start, end){
     const userGames = recentGames.map(game => {
       return getGamePreview(game);
     });
-    const gsaved = await UserGame.upsert({
+    const gameIds = recentGames.map(game => {
+      return { gameId: game.gameId };
+    });
+    addGameQueue(gameIds);
+    const saved = await saveUser({
       userNum,
       userGames,
       start,
       isLast: res.data.isLast,
     });
-    const saved = await User.upsert({
-      userNum,
-      userGames,
-    });
-    if(gsaved && saved) console.log(userNum + ' userGamesInRange saved');
+    if(saved) console.log(userNum + ' userGamesInRange saved');
   }else{
     return res;
+  }
+}
+
+export async function getUserUpdate(userNum){
+  // userSeason 현재시즌, userStat 일겜, 최근경기
+  const seasonId = await getCurrentSeason();
+  try{
+    // User 동시수정 문제때문에 순차수집 아몰랑 나중에 고쳐
+    await getUserSeason(userNum, seasonId);
+    await getUserStats(userNum, 0);
+    await getUserGames(userNum);
+  }catch(e){
+    console.error(e);
   }
 }

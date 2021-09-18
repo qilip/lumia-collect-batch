@@ -10,22 +10,8 @@ const baseLimiter = new Bottleneck({
   minTime: 10,
 });
 
-const lockLimiter = new Bottleneck.Group({
-  reservoir: 100,
-  reservoirIncreaseAmount: 50,
-  reservoirIncreaseInterval: 1000,
-  reservoirIncreaseMaximum: 100,
-  maxConcurrent: 1,
-  minTime: 10,
-});
-
 async function baseJob(option, jobName, param){
   return baseLimiter.schedule(option,
-    () => jobMapper[jobName](param));
-}
-
-async function lockJob(option, jobName, param){
-  return lockLimiter.key(param.userNum.toString()).schedule(option,
     () => jobMapper[jobName](param));
 }
 
@@ -38,4 +24,4 @@ function limitOption(job, param, idx, override = {}){
   }
 }
 
-export { baseLimiter, lockLimiter, baseJob, lockJob, limitOption };
+export { baseLimiter, baseJob, limitOption };

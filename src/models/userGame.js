@@ -27,10 +27,10 @@ UserGame.statics.findByUserNum = function (userNum) {
 UserGame.statics.upsert = async function (data) {
   let userGame = await this.findOne({userNum: data.userNum}).exec();
   if(!userGame) userGame = new this({userNum: data.userNum});
-
+  if(!data.isLast) data['isLast'] = false;
   if(data.userGames){
     const gameCount = data.userGames.length - 1;
-    if(gameCount && data.start) userGame.hasNextGame.set(data.start.toString(), 'y');
+    if(gameCount && data?.start) userGame.hasNextGame.set(data.start.toString(), 'y');
 
     data.userGames.map((game, idx) => {
       const dbValue = userGame.hasNextGame.get(game.gameId.toString());

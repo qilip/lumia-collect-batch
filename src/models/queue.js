@@ -5,7 +5,7 @@ const Queue = new Schema({
   jobName: { type: String, required: true },
   priority: { type: Number, required: true, index: true },
   data: { type: Array, default: [], _id: false },
-  lockedAt: { type: Date, default: new Date(1999, 6, 8) },
+  lockedAt: { type: Date, default: new Date(1999, 6-1, 8) },
   finished: { type: Boolean, default: false }
 }, { timestamps: true, strict: false });
 

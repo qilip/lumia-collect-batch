@@ -6,8 +6,8 @@ const Schedule = new Schema({
   priority: { type: Number, required: true},
   interval: Number,
   data: { type:Array, default: [], _id: false },
-  lockedAt: { type: Date, default: new Date(1999, 6, 8) },
-  lastFinishedAt: { type: Date, default: new Date(1999, 6, 8) },
+  lockedAt: { type: Date, default: new Date(1999, 6-1, 8) },
+  lastFinishedAt: { type: Date, default: new Date(1999, 6-1, 8) },
   nextRunAt: { type: Date, required: true}
 }, { timestamps: true, strict: false });
 

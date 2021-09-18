@@ -1,5 +1,6 @@
 import * as er from '../er.js';
 import GameData from '../../models/gameData.js';
+import Queue from '../../models/queue.js';
 
 export async function getCurrentSeason(){
   let season = await GameData.findByMetaType('Season');
@@ -25,6 +26,31 @@ export async function getCurrentSeason(){
   ).seasonID;
 }
 
+// 원본 er에서 데이터 정리후 반환
+export function getOrgGame(games){
+  const orgGame = {
+    gameId: games[0].gameId,
+    seasonId: games[0].seasonId,
+    matchingMode: games[0].matchingMode,
+    matchingTeamMode: games[0].matchingTeamMode,
+    versionMajor: games[0].versionMajor,
+    versionMinor: games[0].versionMinor,
+    serverName: games[0].serverName,
+    startDtm: games[0].startDtm,
+    botAdded: games[0].botAdded,
+    mmrAvg: games[0].mmrAvg,
+    games: [],
+  };
+  games.map(game => {
+    const {gameId, seasonId, matchingMode,
+    matchingTeamMode, versionMajor,
+    versionMinor, serverName, startDtm,
+    botAdded, mmrAvg, ...data} = game;
+    orgGame.games.push(data);
+  });
+  return orgGame;
+}
+
 export function getGamePreview(game){
   return {
     gameId: game.gameId,
@@ -48,4 +74,12 @@ export function getGamePreview(game){
     damageToPlayer: game.damageToPlayer,
     routeIdOfStart: game.routeIdOfStart,
   };
+}
+
+export async function addGameQueue(gameIds){
+  return Queue.upsert({
+    jobName: 'getGame',
+    priority: 8,
+    data: gameIds,
+  });
 }
