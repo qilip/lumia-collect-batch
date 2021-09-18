@@ -7,7 +7,7 @@ const TopRank = new Schema({
   topRanks: Array
 }, { timestamps: true, strict: false });
 
-TopRank.statics.create = async function (topRankData) {
+TopRank.statics.upsert = async function (topRankData) {
   const existRank = await this.findOne({
     seasonId: topRankData.seasonId,
     matchingTeamMode: topRankData.matchingTeamMode

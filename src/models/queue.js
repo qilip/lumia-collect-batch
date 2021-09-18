@@ -2,14 +2,14 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const Queue = new Schema({
-  jobFuncName: { type: String, required: true },
+  jobName: { type: String, required: true },
   priority: { type: Number, required: true, index: true },
-  data: { type:Array, default: [], _id: false },
-  lockedAt: { type: Date, default: new Date(1999, 6, 8) },
+  data: { type: Array, default: [], _id: false },
+  lockedAt: { type: Date, default: new Date(1999, 6-1, 8) },
   finished: { type: Boolean, default: false }
 }, { timestamps: true, strict: false });
 
-Queue.statics.create = async function (queueData) {
+Queue.statics.upsert = async function (queueData) {
   
   const Queue = new this(queueData);
   return Queue.save();

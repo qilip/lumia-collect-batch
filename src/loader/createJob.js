@@ -6,9 +6,10 @@ export default async () => {
   // DB 아무것도 없을때 Job 초기설정
   const setted = await Schedule.findOne({}).exec();
   if(setted) return;
-  
-  Schedule.create({
-    jobFuncName: 'getUserUpdate',
+  console.log('Schedule job init');
+
+  Schedule.upsert({
+    jobName: 'getUserUpdate',
     priority: 4,
     interval: 24*60,
     data: [
@@ -16,17 +17,17 @@ export default async () => {
     ],
     nextRunAt: new Date(1999,6,8)
   });
-  
-  Schedule.create({
-    jobFuncName: 'getGameData',
+
+  Schedule.upsert({
+    jobName: 'getGameData',
     priority: 4,
     interval: 24*60,
     data: metaTypeData,
     nextRunAt: new Date(1999,6,8)
   });
-  
-  Schedule.create({
-    jobFuncName: 'getL10nData',
+
+  Schedule.upsert({
+    jobName: 'getL10nData',
     priority: 4,
     interval: 24*60,
     data: [
@@ -34,9 +35,9 @@ export default async () => {
     ],
     nextRunAt: new Date(1999,6,8)
   });
-  
-  Schedule.create({
-    jobFuncName: 'getFreeCharacters',
+
+  Schedule.upsert({
+    jobName: 'getFreeCharacters',
     priority: 4,
     interval: 12*60,
     data: [
@@ -44,9 +45,9 @@ export default async () => {
     ],
     nextRunAt: new Date(1999,6,8)
   });
-  
-  Schedule.create({
-    jobFuncName: 'getTopRanks',
+
+  Schedule.upsert({
+    jobName: 'getTopRanks',
     priority: 4,
     interval: 60,
     data: [
