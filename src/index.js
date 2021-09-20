@@ -1,7 +1,14 @@
+import http from 'http';
 import cron from 'node-cron';
 import connect from './loader/connectdb.js';
 import createJob from './loader/createJob.js';
 import * as job from './api/job.js';
+
+// 쓰면 안되는데 ㅋㅋ
+process.on('unhandledRejection', (error, promise) => {
+  console.log('unhandled promise rejection: ', promise);
+  console.log('error: ', error);
+});
 
 // Connect MongoDB
 await connect();
@@ -9,10 +16,21 @@ await connect();
 // DB에 조건 맞을때만 실행하도록 설정
 await createJob();
 
-process.on('unhandledRejection', (error, promise) => {
-  console.log('unhandled promise rejection: ', promise);
-  console.log('error: ', error);
-});
+// Simple Health response
+const server = http.createServer((req, res) => {
+  if(req.url == '/_health'){
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.end("Hello, Lumia.\nLumia Collect Uptime: " + Math.floor(process.uptime()) + " seconds\n");
+  }
+})
+
+const HOSTNAME = process.env.HOSTNAME || 'localhost';
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, HOSTNAME, () => {
+  console.log(`Lumia Collect health listening on ${HOSTNAME}:${PORT}/_health`);
+})
 
 cron.schedule('* * * * * *', () => {
   job.queue();
@@ -51,3 +69,4 @@ cron.schedule('*/3 * * * * *', () => {
 // await ctrl.getUserGamesInRange(1867007, null, 1);
 // await ctrl.getUserGamesInRange(1782120, null, 1);
 // await ctrl.getUserUpdate(2773385);
+// await ctrl.getUserFullUpdate(2773385);

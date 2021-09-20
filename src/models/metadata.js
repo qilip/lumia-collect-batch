@@ -7,7 +7,7 @@ const Metadata = new Schema({
 }, { timestamps: true, strict: false });
 
 Metadata.statics.upsert = async function (metaData) {
-  
+
   const Metadata = new this(metaData);
   return Metadata.save();
 };

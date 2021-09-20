@@ -79,7 +79,11 @@ export async function idle(){
   await Queue.deleteFinished();
   // console.log('Finished queue deleted');
   // 한번 호출마다 수집할 개수
-  const bulk = parseInt(process.env.BULK, 10) || -1;
+  let bulkData = await Metadata.findOne({dataName: 'idleGameCollectBulk'}).exec();
+  if(!bulkData) bulkData = await Metadata.upsert({dataName: 'idleGameCollectBulk',
+                                                  data: { 'bulk': 0 }
+                                                });
+  const bulk = bulkData?.bulk ?? 0;
   if(bulk <= 0) return;
   let gameId;
   try{

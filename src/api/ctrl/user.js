@@ -1,6 +1,5 @@
 import * as er from '../er.js';
 import User from '../../models/user.js';
-import UserGame from '../../models/userGame.js';
 
 import { getCurrentSeason, getGamePreview, addGameQueue } from './util.js';
 import saveUser from './saveUser.js';
@@ -201,10 +200,25 @@ export async function getUserUpdate(userNum){
   // userSeason 현재시즌, userStat 일겜, 최근경기
   const seasonId = await getCurrentSeason();
   try{
-    // User 동시수정 문제때문에 순차수집 아몰랑 나중에 고쳐
-    await getUserSeason(userNum, seasonId);
-    await getUserStats(userNum, 0);
-    await getUserGames(userNum);
+    getUserSeason(userNum, seasonId);
+    getUserStats(userNum, 0);
+    getUserGames(userNum);
+  }catch(e){
+    console.error(e);
+  }
+}
+
+export async function getUserFullUpdate(userNum){
+  // userSeason 현재시즌, userStat 일겜, 최근모든경기
+  const seasonId = getCurrentSeason();
+  try{
+    const user = await User.findById(userNum, 'userGames').lean().exec();
+    let end = 1;
+    if(user?.userGames[0]) end = user.userGames[0]?.gameId;
+
+    getUserSeason(userNum, await seasonId);
+    getUserStats(userNum, 0);
+    getUserGamesInRange(userNum, null, end);
   }catch(e){
     console.error(e);
   }

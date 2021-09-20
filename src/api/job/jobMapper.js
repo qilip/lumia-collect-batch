@@ -16,6 +16,7 @@ const jobMapper = {
   getTopRanks: p => ctrl.getTopRanks(p.seasonId, p.matchingTeamMode),
   getRecommendRoute: p => ctrl.getRecommendRoute(p.start),
   getL10nData: p => ctrl.getL10nData(p.language),
+  getUserFullUpdate: p => ctrl.getUserFullUpdate(p.userNum),
 };
 
 const jobWeight = {
@@ -34,6 +35,7 @@ const jobWeight = {
   getTopRanks: p => 1,
   getRecommendRoute: p => 1,
   getL10nData: p => 1,
+  getUserFullUpdate: p => 6,
 };
 
 export { jobMapper, jobWeight };
