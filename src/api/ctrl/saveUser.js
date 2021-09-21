@@ -30,13 +30,23 @@ export default async function saveUser(data){
     expiration: 6000000, // 10min
     id: 'saveUser-' + userNum + '-' + cuid(),
   }
-  const res = await userLimiter.key(userNum.toString()).schedule(option, async () => {
-      const re = Promise.all([
-        User.upsert(data),
-        UserGame.upsert(data),
-      ]);
+  const existNickname = await User.findByNickname(data.nickname);
+  if(existNickname && existNickname.userNum !== data.userNum){
+    const res = await userLimiter.key(userNum.toString()).schedule(option, async () => {
+        const re = User.upsert({
+          userNum: existNickname.userNum,
+          nickname: '##UNKNOWN##',
+        });
       return await re;
-    }
-  );
+    });
+  };
+
+  const res = await userLimiter.key(userNum.toString()).schedule(option, async () => {
+    const re = Promise.all([
+      User.upsert(data),
+      UserGame.upsert(data),
+    ]);
+    return await re;
+  });
   if(res.state === 'rejected') throw res;
 }

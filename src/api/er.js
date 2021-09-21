@@ -90,10 +90,7 @@ export async function getRoute(routeId){
     return {
       'erCode': res.data.code,
       'message': res.data.message,
-      'data': {
-        'routeId': routeId,
-        'route': res.data.result
-      }
+      'data': { 'route': res.data.result }
     };
   }catch(e){
     console.error(e);

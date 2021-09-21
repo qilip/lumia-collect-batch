@@ -5,25 +5,15 @@ import { getCurrentSeason, getGamePreview, addGameQueue } from './util.js';
 import saveUser from './saveUser.js';
 
 export async function getUserNum(nickname){
-  const existNickname = await User.findByNickname(nickname);
   let res;
   try{
     res = await er.getUserNum(nickname);
   }catch(e){
     console.error(e);
   }
+  if(res.erCode === 404) return;
   if(res.erCode === 200){
     const userNum = res.data.user.userNum;
-    if(existNickname){
-      if(existNickname.userNum !== userNum){
-        saveUser({
-          userNum: existNickname.userNum,
-          nickname: '##UNKNOWN##',
-        });
-      }
-      return;
-    }
-
     const saved = await saveUser({ nickname, userNum });
     if(saved) console.log(nickname + ' UserNum saved');
   }else{

@@ -1,6 +1,7 @@
 import * as er from '../er.js';
 import GameData from '../../models/gameData.js';
 import Queue from '../../models/queue.js';
+import Route from '../../models/route.js';
 
 export async function getCurrentSeason(){
   let season = await GameData.findByMetaType('Season');
@@ -76,10 +77,38 @@ export function getGamePreview(game){
   };
 }
 
+export function getOrgRoute(route){
+  const {id, ...routeInfo} = route.route.recommendWeaponRoute;
+  const {recommendWeaponRouteId, skillPath, ...routeDesc} = route.route.recommendWeaponRouteDesc;
+  return {
+    routeId: id,
+    ...routeInfo,
+    skillPath,
+    routeDesc,
+  };
+}
+
 export async function addGameQueue(gameIds){
   return Queue.upsert({
     jobName: 'getGame',
     priority: 8,
     data: gameIds,
+  });
+}
+
+export async function addRouteQueue(routeIds){
+  const newRoutes = (await Promise.all(
+    routeIds.map(async (cur) => {
+      const existRoute = await Route.findByRouteId(cur);
+      if(!existRoute && cur > 0) return cur;
+    })
+  )).reduce((acc, cur) => {
+    if(cur) acc.push( {routeId: cur} );
+    return acc;
+  }, []);
+  return Queue.upsert({
+    jobName: 'getRoute',
+    priority: 8,
+    data: newRoutes,
   });
 }

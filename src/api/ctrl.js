@@ -1,5 +1,4 @@
 import * as er from './er.js';
-import User from '../models/user.js';
 import Route from '../models/route.js';
 import FreeCharacter from '../models/freeCharacter.js';
 import GameData from '../models/gameData.js';
@@ -10,7 +9,7 @@ export * from './ctrl/util.js';
 export * from './ctrl/getGame.js';
 export * from './ctrl/user.js';
 
-import { getCurrentSeason } from './ctrl/util.js';
+import { getCurrentSeason, getOrgRoute } from './ctrl/util.js';
 
 export async function getRoute(routeId){
   let res;
@@ -19,8 +18,9 @@ export async function getRoute(routeId){
   }catch(e){
     console.error(e);
   }
+  if(res.erCode === 404) return;
   if(res.erCode === 200){
-    const saved = await Route.upsert(res.data);
+    const saved = await Route.upsert(getOrgRoute(res.data));
     if(saved) console.log(routeId + ' route saved or updated');
   }else{
     return res;

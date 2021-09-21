@@ -25,6 +25,7 @@ Game.statics.upsert = async function (newGame) {
   const existGame = await this.findById(newGame.gameId).exec();
   if(existGame){
     Object.assign(existGame, newGame);
+    existGame.dataUpdatedAt = new Date();
     return existGame.save();
   }
   newGame['_id'] = newGame.gameId;

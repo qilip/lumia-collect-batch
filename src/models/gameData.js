@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const GameData = new Schema({
   metaType: { type: String, unique: true, required: true },
   data: {}
-}, { timestamps: true, strict: false });
+}, { timestamps: true });
 
 GameData.statics.findByMetaType = function (metaType) {
   return this.findOne({metaType}).exec();
