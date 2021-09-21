@@ -15,7 +15,7 @@ export async function getUserNum(nickname){
   if(res.erCode === 200){
     const userNum = res.data.user.userNum;
     const saved = await saveUser({ nickname, userNum });
-    if(saved) console.log(nickname + ' UserNum saved');
+    // if(saved) console.log(nickname + ' UserNum saved');
   }else{
     return res;
   }
@@ -40,7 +40,7 @@ export async function getUserRank(userNum, seasonId){
       userNum,
       userRank,
     });
-    if(saved) console.log(userNum + ' season: ' + seasonId + ' userRank saved');
+    // if(saved) console.log(userNum + ' season: ' + seasonId + ' userRank saved');
   }else{
     return res;
   }
@@ -65,7 +65,7 @@ export async function getUserStats(userNum, seasonId){
       userNum,
       userStats,
     });
-    if(saved) console.log(userNum + ' season: ' + seasonId + ' userStats saved');
+    // if(saved) console.log(userNum + ' season: ' + seasonId + ' userStats saved');
   }else{
     return res;
   }
@@ -95,7 +95,7 @@ export async function getUserSeason(userNum, seasonId){
       userRank,
       userStats,
     });
-    if(saved) console.log(userNum + ' season: ' + seasonId + ' userSeason saved');
+    // if(saved) console.log(userNum + ' season: ' + seasonId + ' userSeason saved');
   }else{
     return res;
   }
@@ -123,7 +123,7 @@ export async function getUserGames(userNum, start){
       start,
       isLast: res.data.isLast,
     });
-    if(saved) console.log(userNum + ' userGames saved');
+    // if(saved) console.log(userNum + ' userGames saved');
   }else{
     return res;
   }
@@ -151,7 +151,7 @@ export async function getUserRecentGames(userNum, start, limit){
       start,
       isLast: res.data.isLast,
     });
-    if(saved) console.log(userNum + ' userRecentGames saved');
+    // if(saved) console.log(userNum + ' userRecentGames saved');
   }else{
     return res;
   }
@@ -180,7 +180,7 @@ export async function getUserGamesInRange(userNum, start, end){
       start,
       isLast: res.data.isLast,
     });
-    if(saved) console.log(userNum + ' userGamesInRange saved');
+    // if(saved) console.log(userNum + ' userGamesInRange saved');
   }else{
     return res;
   }

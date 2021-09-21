@@ -13,7 +13,7 @@ export async function getCurrentSeason(){
           metaType: 'Season',
           data: res.data
         });
-        if(season) console.log('Season GameData saved or updated');
+        // if(season) console.log('Season GameData saved or updated');
       }else{
         throw new Error('get Season data failed');
       }

@@ -27,7 +27,7 @@ export async function getGame(gameId){
     addRouteQueue(routeIds);
     const orgGame = getOrgGame(res.data);
     const saved = await Game.upsert(orgGame);
-    if(saved) console.log(gameId + ' gamedata saved or updated');
+    // if(saved) console.log(gameId + ' gamedata saved or updated');
   }else{
     return res;
   }

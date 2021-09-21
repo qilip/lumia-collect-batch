@@ -140,7 +140,7 @@ export async function idle(){
   try{
     await Promise.all(req);
   }catch(e){
-    console.log(e);
+    console.error(e);
     return;
   }
 
