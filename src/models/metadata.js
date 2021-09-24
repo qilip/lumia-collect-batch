@@ -4,10 +4,10 @@ const { Schema } = mongoose;
 const Metadata = new Schema({
   dataName: { type: String, required: true, unique: true },
   data: { type: {}, _id: false }
-}, { timestamps: true, strict: false });
+}, { timestamps: true });
 
 Metadata.statics.upsert = async function (metaData) {
-  
+
   const Metadata = new this(metaData);
   return Metadata.save();
 };

@@ -53,15 +53,18 @@ User.statics.upsert = async function (data) {
         }
       );
     user.nickname = data.nickname;
+    user.dataUpdatedAt = new Date();
   }
 
   if(data.userRank){
     const seasonId = data.userRank.seasonId;
     user.userRank.set(seasonId, data.userRank.rank);
+    user.dataUpdatedAt = new Date();
   }
   if(data.userStats){
     const seasonId = data.userStats.seasonId;
     user.userStats.set(seasonId, data.userStats.stats);
+    user.dataUpdatedAt = new Date();
   }
 
   if(data.userGames){
@@ -78,7 +81,6 @@ User.statics.upsert = async function (data) {
     user.userGames = uGames.slice(0, 10);
   }
 
-  user.dataUpdatedAt = new Date();
   return user.save();
 }
 

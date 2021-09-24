@@ -9,7 +9,7 @@ export async function getUserGames(userNum, start){
     }else{
       res = await er.get('/user/games/' + userNum);
     }
-    console.log('getUserGames Response Time: ' + res.duration);
+    // console.log('getUserGames Response Time: ' + res.duration);
     return {
       'erCode': res.data.code,
       'message': res.data.message,
@@ -40,7 +40,7 @@ export async function getUserRecentGames(userNum, start, limit){
       }else{
         res = await er.get('/user/games/' + userNum);
       }
-      console.log('getUserGames[' + (i/10) + '] Response Time: ' + res.duration);
+      // console.log('getUserGames[' + (i/10) + '] Response Time: ' + res.duration);
       if(res.data.code !== 200) return { 'erCode': res.data.code, 'message': res.data.message };
       games.push(...res.data.userGames);
       next = res.data.next || -1;
@@ -77,7 +77,7 @@ export async function getUserGamesInRange(userNum, start, end){
       }else{
         res = await er.get('/user/games/' + userNum);
       }
-      console.log('getGamesInRange[' + loop + '] Response Time: ' + res.duration);
+      // console.log('getGamesInRange[' + loop + '] Response Time: ' + res.duration);
       if(res.data.code !== 200) return { 'erCode': res.data.code, 'message': res.data.message };
       games.push(...res.data.userGames);
       next = res.data.next || -1;

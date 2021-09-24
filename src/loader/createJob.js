@@ -9,11 +9,23 @@ export default async () => {
   console.log('Schedule job init');
 
   Schedule.upsert({
-    jobName: 'getUserUpdate',
+    jobName: 'getUserFullUpdate',
     priority: 4,
     interval: 24*60,
     data: [
       { userNum: 2773385 }
+    ],
+    nextRunAt: new Date(1999,6,8)
+  });
+
+  Schedule.upsert({
+    jobName: 'getUserUpdate',
+    priority: 4,
+    interval: 24*60,
+    data: [
+      { userNum: 1867007 },
+      { userNum: 1782120 },
+      { userNum: 9628082 }
     ],
     nextRunAt: new Date(1999,6,8)
   });

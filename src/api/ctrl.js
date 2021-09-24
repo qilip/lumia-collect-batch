@@ -1,5 +1,4 @@
 import * as er from './er.js';
-import User from '../models/user.js';
 import Route from '../models/route.js';
 import FreeCharacter from '../models/freeCharacter.js';
 import GameData from '../models/gameData.js';
@@ -10,7 +9,7 @@ export * from './ctrl/util.js';
 export * from './ctrl/getGame.js';
 export * from './ctrl/user.js';
 
-import { getCurrentSeason } from './ctrl/util.js';
+import { getCurrentSeason, getOrgRoute } from './ctrl/util.js';
 
 export async function getRoute(routeId){
   let res;
@@ -19,9 +18,10 @@ export async function getRoute(routeId){
   }catch(e){
     console.error(e);
   }
+  if(res.erCode === 404) return;
   if(res.erCode === 200){
-    const saved = await Route.upsert(res.data);
-    if(saved) console.log(routeId + ' route saved or updated');
+    const saved = await Route.upsert(getOrgRoute(res.data));
+    // if(saved) console.log(routeId + ' route saved or updated');
   }else{
     return res;
   }
@@ -39,7 +39,7 @@ export async function getFreeCharacters(matchingMode){
       matchingMode,
       characters: res.data.freeCharacters
     });
-    if(saved) console.log(matchingMode + ' FreeCharacter saved');
+    // if(saved) console.log(matchingMode + ' FreeCharacter saved');
   }else{
     return res;
   }
@@ -61,7 +61,7 @@ export async function getTopRanks(seasonId, matchingTeamMode){
       matchingTeamMode,
       topRanks: res.data.topRanks
     });
-    if(saved) console.log(`seasonId ${seasonId}, matchingTeammode ${matchingTeamMode} TopRank saved or updated`);
+    // if(saved) console.log(`seasonId ${seasonId}, matchingTeammode ${matchingTeamMode} TopRank saved or updated`);
   }
 }
 
@@ -81,7 +81,7 @@ export async function getGameData(metaType){
       metaType: metaType,
       data: res.data
     });
-    if(saved) console.log(metaType + ' GameData saved or updated');
+    // if(saved) console.log(metaType + ' GameData saved or updated');
   }else{
     return res;
   }
@@ -99,7 +99,7 @@ export async function getL10nData(language){
       metaType: 'l10n-' + language,
       data: res.data
     });
-    if(saved) console.log(language + ' l10n saved or updated');
+    // if(saved) console.log(language + ' l10n saved or updated');
   }else{
     return res;
   }

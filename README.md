@@ -1,7 +1,5 @@
 # Lumia Collect - Batch
 
-Lumia Collect로 이름 바꿀까?
-
 doppler install
 
 https://docs.doppler.com/docs/enclave-installation

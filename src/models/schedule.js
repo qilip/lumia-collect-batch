@@ -8,33 +8,38 @@ const Schedule = new Schema({
   data: { type:Array, default: [], _id: false },
   lockedAt: { type: Date, default: new Date(1999, 6-1, 8) },
   lastFinishedAt: { type: Date, default: new Date(1999, 6-1, 8) },
-  nextRunAt: { type: Date, required: true}
-}, { timestamps: true, strict: false });
+  nextRunAt: { type: Date, required: true},
+  failCount: { type: Number, default: 0 },
+}, { timestamps: true });
 
 Schedule.index({ priority: -1, nextRunAt: -1 });
 
-Schedule.statics.upsert = async function (ScheduleData) {
-  
+Schedule.statics.upsert = function (ScheduleData) {
   const Schedule = new this(ScheduleData);
   return Schedule.save();
 };
 
-Schedule.statics.lock = async function (job) {
+Schedule.statics.lock = function (job) {
   job.lockedAt = new Date();
   return job.save();
 };
 
-Schedule.statics.unlock = async function (job) {
+Schedule.statics.unlock = function (job) {
   job.lockedAt = new Date(2000, 6, 8);
   return job.save();
 };
 
-Schedule.statics.finished = async function (job) {
+Schedule.statics.finished = function (job) {
   let nextRunTime = new Date();
   nextRunTime.setMinutes(nextRunTime.getMinutes() + job.interval);
   job.lastFinishedAt = new Date();
   job.nextRunAt = nextRunTime;
   return job.save();
 };
+
+Schedule.statics.failed = function (job) {
+  job.failCount += 1;
+  return job.save();
+}
 
 export default mongoose.model('Schedule', Schedule);

@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const FreeCharacter = new Schema({
   matchingMode: Number,
   characters: [Number],
-}, { timestamps: true, strict: false });
+}, { timestamps: true });
 
 FreeCharacter.statics.upsert = async function (freeCharactersData) {
   const sortedCharacters = freeCharactersData.characters.slice().sort((a,b)=>a-b);

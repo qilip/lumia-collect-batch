@@ -23,21 +23,21 @@ export async function queue(){
     console.error(e);
   }
   const jobName = job.jobName;
-  let error = false;
-  job.data.map(async (param, idx) => {
+  const error = job.data.map(async (param, idx) => {
     const option = limitOption(job, param, idx);
     try{
       const res = await baseJob(option, jobName, param);
       if(res) throw res;
+      else return 0;
     }catch(e){
-      error = true;
       // await Queue.unlock(job); // 디버깅용
       console.error(e);
       console.error('JOB: ' + job);
-      return;
+      return 1;
     }
   });
-  if(!error) await Queue.finished(job);
+  if(!error.find(a => a === 1)) await Queue.finished(job);
+  else await Queue.failed(job);
 }
 
 export async function schedule(){
@@ -57,21 +57,21 @@ export async function schedule(){
     console.error(e);
   }
   const jobName = job.jobName;
-  let error = false;
-  job.data.map(async (param, idx) => {
+  const error = job.data.map(async (param, idx) => {
     const option = limitOption(job, param, idx);
     try{
       const res = await baseJob(option, jobName, param);
       if(res) throw res;
+      else return 0;
     }catch(e){
-      error = true;
       // await Schedule.unlock(job); // 디버깅용
       console.error(e);
       console.error('Scheduled JOB: ' + job);
-      return;
+      return 1;
     }
   });
-  if(!error) await Schedule.finished(job);
+  if(!error.find(a => a === 1)) await Schedule.finished(job);
+  else await Schedule.failed(job);
 }
 
 export async function idle(){
@@ -79,7 +79,11 @@ export async function idle(){
   await Queue.deleteFinished();
   // console.log('Finished queue deleted');
   // 한번 호출마다 수집할 개수
-  const bulk = parseInt(process.env.BULK, 10) || -1;
+  let bulkData = await Metadata.findOne({dataName: 'idleGameCollectBulk'}).exec();
+  if(!bulkData) bulkData = await Metadata.upsert({dataName: 'idleGameCollectBulk',
+                                                  data: { 'bulk': 0 }
+                                                });
+  const bulk = bulkData?.bulk ?? 0;
   if(bulk <= 0) return;
   let gameId;
   try{
@@ -136,7 +140,7 @@ export async function idle(){
   try{
     await Promise.all(req);
   }catch(e){
-    console.log(e);
+    console.error(e);
     return;
   }
 
