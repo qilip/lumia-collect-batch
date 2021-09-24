@@ -79,7 +79,9 @@ export function getGamePreview(game){
 
 export function getOrgRoute(route){
   const {id, ...routeInfo} = route.route.recommendWeaponRoute;
-  const {recommendWeaponRouteId, skillPath, ...routeDesc} = route.route.recommendWeaponRouteDesc;
+  const {recommendWeaponRouteId=id, skillPath='', ...routeDesc} = route.route?.recommendWeaponRouteDesc ?? {
+    routeDesc: '',
+  };
   return {
     routeId: id,
     ...routeInfo,

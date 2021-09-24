@@ -51,7 +51,7 @@ Route.statics.upsert = async function (routeData) {
   const existRoute = await this.findById(routeData.routeId).exec();
   routeData['_id'] = routeData.routeId;
   routeData['dataUpdatedAt'] = new Date();
-  if(routeData.weaponCode)
+  if(routeData.weaponCodes)
     routeData.weaponCodes = routeData.weaponCodes.split(',');
   if(routeData.paths)
     routeData.paths = routeData.paths.split(',');
@@ -60,9 +60,10 @@ Route.statics.upsert = async function (routeData) {
   if(existRoute){
     Object.assign(existRoute, routeData);
     return existRoute.save();
+  }else{
+    const Route = new this(routeData);
+    return Route.save();
   }
-  const Route = new this(routeData);
-  return Route.save();
 };
 
 export default mongoose.model('Route', Route);
