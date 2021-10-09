@@ -25,7 +25,7 @@ export default async () => {
     data: [
       { userNum: 1867007 },
       { userNum: 1782120 },
-      { userNum: 9628082 }
+      { userNum: 2773611 }
     ],
     nextRunAt: new Date(1999,6,8)
   });

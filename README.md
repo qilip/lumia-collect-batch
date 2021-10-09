@@ -1,5 +1,11 @@
 # Lumia Collect - Batch
 
+docker hub
+
+https://hub.docker.com/r/qilip/lumia-collect-batch
+
+### Dev
+
 doppler install
 
 https://docs.doppler.com/docs/enclave-installation
